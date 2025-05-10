@@ -1,6 +1,5 @@
 
 import React, { useState, useRef } from "react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Camera, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -188,14 +187,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
               message.sender === "user" ? "justify-end" : "justify-start"
             }`}
           >
-            {message.sender === "bot" && (
-              <div className="mr-2">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png" alt="Ava" />
-                  <AvatarFallback>AVA</AvatarFallback>
-                </Avatar>
-              </div>
-            )}
             <div
               className={`p-3 rounded-lg max-w-[80%] ${
                 message.sender === "user"
@@ -222,12 +213,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         ))}
         {isAnalyzing && (
           <div className="flex justify-start mb-2">
-            <div className="mr-2">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png" alt="Ava" />
-                <AvatarFallback>AVA</AvatarFallback>
-              </Avatar>
-            </div>
             <div className="bg-white border border-gray-300 p-3 rounded-lg">
               <div className="flex items-center">
                 <span className="mr-2">Dokument wird analysiert</span>
