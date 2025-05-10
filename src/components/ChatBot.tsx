@@ -300,6 +300,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </button>
       </div>
       
+      {/* Removed the duplicate Continue button and kept only the one at the bottom */}
       <div className="flex justify-end">
         <button
           onClick={onComplete}
