@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Message {
   id: number;
@@ -95,6 +96,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
               message.sender === "user" ? "justify-end" : "justify-start"
             }`}
           >
+            {message.sender === "bot" && (
+              <div className="mr-2">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png" alt="Ava" />
+                  <AvatarFallback>AVA</AvatarFallback>
+                </Avatar>
+              </div>
+            )}
             <div
               className={`p-3 rounded-lg max-w-[80%] ${
                 message.sender === "user"
