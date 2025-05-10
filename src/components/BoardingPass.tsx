@@ -133,7 +133,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                 <span className="text-sm text-gray-700">
-                  Please show this pass upon arrival
+                  Please scan this pass at the terminal upon arrival
                 </span>
               </li>
               <li className="flex items-start">
