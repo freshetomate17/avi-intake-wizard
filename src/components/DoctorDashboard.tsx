@@ -1,6 +1,15 @@
 
 import React, { useState } from "react";
 import { Calendar, Clock, User, FileText, Award } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 const DoctorDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
@@ -57,25 +66,40 @@ const DoctorDashboard: React.FC = () => {
     },
   ];
 
+  // Get the active bonus program name, or "Keines genutzt" if none is active
+  const getActiveBonusProgram = () => {
+    const allAppointments = [...upcomingAppointments, ...historyAppointments];
+    const activeBonusPrograms = allAppointments
+      .filter(appointment => appointment.bonusProgram !== null)
+      .map(appointment => appointment.bonusProgram);
+    
+    if (activeBonusPrograms.length > 0) {
+      // Return the first active program if there are multiple (for simplicity)
+      return activeBonusPrograms[0];
+    } else {
+      return "Keines genutzt";
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
         return (
-          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+          <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100">
             Bestätigt
-          </span>
+          </Badge>
         );
       case "pending":
         return (
-          <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+          <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100">
             Ausstehend
-          </span>
+          </Badge>
         );
       case "completed":
         return (
-          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+          <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100">
             Abgeschlossen
-          </span>
+          </Badge>
         );
       default:
         return null;
@@ -83,13 +107,19 @@ const DoctorDashboard: React.FC = () => {
   };
 
   const getBonusProgramBadge = (program: string | null) => {
-    if (!program) return null;
+    if (!program) {
+      return (
+        <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-100">
+          Kein Programm
+        </Badge>
+      );
+    }
     
     return (
-      <span className="flex items-center px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full gap-1">
+      <Badge variant="outline" className="bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-100 flex items-center gap-1">
         <Award className="h-3 w-3" />
         {program}
-      </span>
+      </Badge>
     );
   };
 
@@ -130,8 +160,8 @@ const DoctorDashboard: React.FC = () => {
             <Award className="h-6 w-6 text-purple-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Bonusprogramm-Teilnehmer</p>
-            <p className="text-2xl font-bold">4</p>
+            <p className="text-sm text-gray-500">Bonusprogramm</p>
+            <p className="text-lg font-bold">{getActiveBonusProgram()}</p>
           </div>
         </div>
       </div>
@@ -164,61 +194,47 @@ const DoctorDashboard: React.FC = () => {
 
       {/* Appointment List */}
       <div className="bg-white rounded-lg overflow-hidden flex-grow">
-        <table className="min-w-full">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Patient
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Datum & Zeit
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Typ
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Bonusprogramm
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Aktionen
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Patient</TableHead>
+              <TableHead>Datum & Zeit</TableHead>
+              <TableHead>Typ</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Bonusprogramm</TableHead>
+              <TableHead>Aktionen</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {(activeTab === "upcoming" ? upcomingAppointments : historyAppointments).map(
               (appointment) => (
-                <tr key={appointment.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="font-medium text-gray-900">
-                      {appointment.patient}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-gray-900">{appointment.date}</div>
+                <TableRow key={appointment.id}>
+                  <TableCell className="font-medium">
+                    {appointment.patient}
+                  </TableCell>
+                  <TableCell>
+                    <div>{appointment.date}</div>
                     <div className="text-gray-500">{appointment.time}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                  </TableCell>
+                  <TableCell className="text-gray-500">
                     {appointment.type}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  </TableCell>
+                  <TableCell>
                     {getStatusBadge(appointment.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  </TableCell>
+                  <TableCell>
                     {getBonusProgramBadge(appointment.bonusProgram)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  </TableCell>
+                  <TableCell>
                     <button className="text-primary hover:text-primary-dark">
                       Details
                     </button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
