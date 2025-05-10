@@ -9,6 +9,7 @@ declare global {
 import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
+import { stringify } from "querystring";
 
 interface Message {
   id: number;
@@ -29,6 +30,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   // Removed step state and questions array as per instructions
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   // speech recognition instance
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,6 +86,8 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
     window.speechSynthesis.cancel();
 
     const utter = new SpeechSynthesisUtterance(last.text);
+    utter.onstart = () => setIsSpeaking(true);
+    utter.onend = () => setIsSpeaking(false);
     // Use browser language or fallback
     utter.lang = navigator.language || "en-US";
 
@@ -106,7 +110,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
 
   const sendInitialDetails = async () => {
     setIsLoadingChat(true);
-    const details = `Name: ${name}\nDate of Birth: ${birthdate}\nReason for Visit: ${reason}`;
+    const details = `My name is ${name}\n and Date of Birth is ${birthdate}\n and my reason for Visit is ${reason}`;
     try {
       const res = await fetch(
         "https://avibackend-be6209427017.herokuapp.com/api/generate_answer",
@@ -139,6 +143,11 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
   };
 
   const handleSend = async (overrideText?: string) => {
+    console.log(messages);
+    if (overrideText !== undefined && (typeof overrideText == 'string')) {
+      console.log("string");
+    }
+
     const toSend = overrideText !== undefined ? overrideText : input;
     if (!toSend.trim()) return;
 
@@ -173,6 +182,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       );
       const data = await res.json();
       if (data["Chat History"]) {
+        console.log("Replacing history");
         // replace entire conversation
         setMessages(
           data["Chat History"].map((entry: any, idx: number) => ({
@@ -258,6 +268,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
     }, 2000);
   };
 
+
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digital Check-in</h2>
@@ -280,12 +291,28 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       {/* Ava avatar */}
 
       {/* Ava animation */}
-      <div className="flex justify-center mb-6">
-        <div className="w-64 h-64 rounded-full overflow-hidden">
-          <img
-            src="/lovable-uploads/4b4e8c7a-0eea-4672-a169-74b5a16d3295.png"
-            alt="Ava"
-            className="w-full h-full object-cover"
+      <div className="flex justify-center">
+        <div className="w-64 h-64 rounded-full overflow-hidden relative">
+          <video
+            src="/videos/waiting.mp4"
+            autoPlay
+            loop
+            muted
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${!isLoadingChat && !isSpeaking ? 'opacity-100' : 'opacity-0'}`}
+          />
+          <video
+            src="/videos/thinking.mp4"
+            autoPlay
+            loop
+            muted
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isLoadingChat && !isSpeaking ? 'opacity-100' : 'opacity-0'}`}
+          />
+          <video
+            src="/videos/speaking.mp4"
+            autoPlay
+            loop
+            muted
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isSpeaking ? 'opacity-100' : 'opacity-0'}`}
           />
         </div>
       </div>
