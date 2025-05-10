@@ -1,23 +1,13 @@
 
 import React, { useState, useRef, useEffect } from "react";
-import { Camera, FileText, Mic, MicOff } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "./ui/button";
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { ChatProps, Message } from "./chat/types";
+import { useSpeechToText } from "@/hooks/useSpeechToText";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import MessageList from "./chat/MessageList";
+import ChatInput from "./chat/ChatInput";
+import InfoMessages from "./chat/InfoMessages";
 
-interface Message {
-  id: number;
-  text: string;
-  sender: "user" | "bot";
-  documentUrl?: string;
-  documentName?: string;
-}
-
-interface ChatBotProps {
-  onComplete: () => void;
-}
-
-const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
+const ChatBot: React.FC<ChatProps> = ({ onComplete }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -32,19 +22,11 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   ]);
   const [input, setInput] = useState("");
   const [step, setStep] = useState(0);
-  const [isRecording, setIsRecording] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
-  // Speech recognition setup
-  const {
-    transcript,
-    listening,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-    isMicrophoneAvailable
-  } = useSpeechRecognition();
+  // Custom hooks
+  const { transcript, isRecording, startRecording, stopRecording, resetTranscript } = useSpeechToText();
+  const { isAnalyzing, handleFileUpload } = useFileUpload(setMessages);
 
   // Update input field when transcript changes
   useEffect(() => {
@@ -103,137 +85,27 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     }
   };
 
-  const startRecording = () => {
-    if (!browserSupportsSpeechRecognition) {
-      toast({
-        title: "Error",
-        description: "Your browser doesn't support speech recognition.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!isMicrophoneAvailable) {
-      toast({
-        title: "Microphone Access",
-        description: "Please allow microphone access to use voice input.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsRecording(true);
-    resetTranscript();
-    SpeechRecognition.startListening({ continuous: true });
-  };
-
-  const stopRecording = () => {
-    setIsRecording(false);
-    SpeechRecognition.stopListening();
-  };
-
   const triggerFileUpload = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     
     const file = e.target.files[0];
-    
-    // Create object URL for preview
-    const objectUrl = URL.createObjectURL(file);
-    
-    // Add user message with document
-    setMessages((prev) => [
-      ...prev,
-      { 
-        id: prev.length + 1, 
-        text: "Document uploaded", 
-        sender: "user",
-        documentUrl: objectUrl,
-        documentName: file.name
-      },
-    ]);
-    
-    // Set analyzing state
-    setIsAnalyzing(true);
+    handleFileUpload(file);
     
     // Reset file input for future uploads
     if (fileInputRef.current) fileInputRef.current.value = '';
-    
-    // Simulate document analysis
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      
-      // Determine document type based on filename
-      let docType = "Unknown document";
-      if (file.name.toLowerCase().includes("insurance")) {
-        docType = "Insurance card";
-      } else if (file.name.toLowerCase().includes("referral")) {
-        docType = "Doctor's referral";
-      } else if (file.name.toLowerCase().includes("report")) {
-        docType = "Medical report";
-      }
-      
-      // Add bot response with document analysis
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          text: `I've analyzed your document. It appears to be: ${docType}. Is this correct?`,
-          sender: "bot",
-        },
-      ]);
-      
-      // Show toast notification
-      toast({
-        title: "Document analyzed",
-        description: `Document recognized as ${docType}`,
-      });
-    }, 2000);
   };
-
-  // Show browser compatibility message if speech recognition is not supported
-  if (!browserSupportsSpeechRecognition) {
-    toast({
-      title: "Browser not supported",
-      description: "Your browser doesn't support speech recognition. Please use Chrome for the best experience.",
-      variant: "destructive",
-    });
-  }
 
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digital Check-in</h2>
       
-      {/* Voice interaction notification */}
-      <div className="bg-primary/10 rounded-lg p-3 mb-4 flex items-center border border-primary/20">
-        <Mic className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
-        <p className="text-sm">
-          <span className="font-medium">Voice-enabled assistant:</span> You can communicate with Ava through voice. Click the microphone button to start or stop recording.
-        </p>
-      </div>
-      
-      {/* Photo capabilities information */}
-      <div className="bg-blue-50 rounded-lg p-3 mb-4 flex items-start border border-blue-200">
-        <Camera className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
-        <p className="text-sm">
-          <span className="font-medium">Photo upload available:</span> You can take photos of medical documents, prescriptions, medical devices (blood pressure/glucose monitors), medication packages, or physical symptoms for better assistance.
-        </p>
-      </div>
-      
-      {/* Microphone status indicator when recording */}
-      {isRecording && (
-        <div className="bg-red-50 rounded-lg p-3 mb-4 flex items-center border border-red-200">
-          <Mic className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 animate-pulse" />
-          <p className="text-sm">
-            <span className="font-medium">Recording:</span> Speak clearly into your microphone. Click the microphone button again to stop.
-          </p>
-        </div>
-      )}
+      <InfoMessages isRecording={isRecording} />
       
       {/* Ava animation */}
       <div className="flex justify-center mb-6">
@@ -246,104 +118,25 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </div>
       </div>
       
-      {/* Messages container */}
-      <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`mb-2 flex ${
-              message.sender === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`p-3 rounded-lg max-w-[80%] ${
-                message.sender === "user"
-                  ? "bg-primary text-white"
-                  : "bg-white border border-gray-300"
-              }`}
-            >
-              {message.text}
-              {message.documentUrl && (
-                <div className="mt-2 flex items-center">
-                  <FileText className="h-5 w-5 mr-2" />
-                  <a 
-                    href={message.documentUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-sm underline"
-                  >
-                    {message.documentName}
-                  </a>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-        {isAnalyzing && (
-          <div className="flex justify-start mb-2">
-            <div className="bg-white border border-gray-300 p-3 rounded-lg">
-              <div className="flex items-center">
-                <span className="mr-2">Analyzing document</span>
-                <div className="flex space-x-1">
-                  <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
-                  <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <MessageList messages={messages} isAnalyzing={isAnalyzing} />
       
-      {/* Input area */}
       <div className="flex items-center mb-4">
         <input
           type="file"
           ref={fileInputRef}
-          onChange={handleFileUpload}
+          onChange={onFileChange}
           accept=".pdf,.jpg,.jpeg,.png"
           className="hidden"
         />
-        <button
-          onClick={triggerFileUpload}
-          className="p-2 rounded-full mr-2 bg-gray-200 hover:bg-gray-300 flex items-center justify-center"
-          title="Upload document or photo"
-        >
-          <Camera size={24} />
-        </button>
-        <button
-          onClick={isRecording ? stopRecording : startRecording}
-          className={`p-2 rounded-full mr-2 ${
-            isRecording ? "bg-red-500 text-white" : "bg-gray-200 hover:bg-gray-300"
-          } flex items-center justify-center`}
-          title={isRecording ? "Stop recording" : "Start voice input"}
-        >
-          {isRecording ? (
-            <MicOff size={24} />
-          ) : (
-            <Mic size={24} />
-          )}
-        </button>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Enter your response..."
-          className="flex-grow border rounded-lg p-2"
+        <ChatInput 
+          input={input}
+          setInput={setInput}
+          handleSend={handleSend}
+          isRecording={isRecording}
+          startRecording={startRecording}
+          stopRecording={stopRecording}
+          triggerFileUpload={triggerFileUpload}
         />
-        <button
-          onClick={handleSend}
-          disabled={!input.trim()}
-          className={`ml-2 p-2 rounded-full ${
-            input.trim() ? "bg-primary text-white" : "bg-gray-200"
-          } flex items-center justify-center`}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="22" x2="11" y1="2" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
-        </button>
       </div>
       
       {/* Continue button */}
