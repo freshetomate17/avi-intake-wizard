@@ -1,11 +1,92 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from "react";
+import LandingBooking from "@/components/LandingBooking";
+import ChatBot from "@/components/ChatBot";
+import UploadDocs from "@/components/UploadDocs";
+import BoardingPass from "@/components/BoardingPass";
+import DoctorDashboard from "@/components/DoctorDashboard";
+
+// Main flow steps
+enum FlowStep {
+  LANDING,
+  CHATBOT,
+  UPLOAD,
+  BOARDING_PASS,
+  DOCTOR_DASHBOARD
+}
 
 const Index = () => {
+  const [currentStep, setCurrentStep] = useState<FlowStep>(FlowStep.LANDING);
+
+  // Function to navigate to next step
+  const goToNextStep = () => {
+    setCurrentStep(prev => {
+      if (prev < FlowStep.DOCTOR_DASHBOARD) {
+        return prev + 1;
+      }
+      return prev;
+    });
+  };
+
+  // Function to navigate to a specific step
+  const goToStep = (step: FlowStep) => {
+    setCurrentStep(step);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-background flex flex-col items-center">
+      <div className="w-full max-w-3xl p-4">
+        {/* Progress indicator */}
+        <div className="w-full mb-6 flex justify-between">
+          {Object.keys(FlowStep)
+            .filter(key => !isNaN(Number(key)))
+            .map((step, index) => (
+              <div 
+                key={step}
+                className={`w-full h-1 ${
+                  Number(step) <= currentStep ? "bg-primary" : "bg-gray-200"
+                } ${index < 4 ? "mr-1" : ""}`}
+              />
+            ))}
+        </div>
+
+        {/* Current step component */}
+        {currentStep === FlowStep.LANDING && (
+          <LandingBooking onComplete={goToNextStep} />
+        )}
+        {currentStep === FlowStep.CHATBOT && (
+          <ChatBot onComplete={goToNextStep} />
+        )}
+        {currentStep === FlowStep.UPLOAD && (
+          <UploadDocs onComplete={goToNextStep} />
+        )}
+        {currentStep === FlowStep.BOARDING_PASS && (
+          <BoardingPass onComplete={goToNextStep} />
+        )}
+        {currentStep === FlowStep.DOCTOR_DASHBOARD && (
+          <DoctorDashboard />
+        )}
+
+        {/* Navigation buttons */}
+        <div className="mt-8 flex justify-between">
+          {currentStep > FlowStep.LANDING && (
+            <button
+              onClick={() => setCurrentStep(prev => prev - 1)}
+              className="px-4 py-2 border border-primary text-primary rounded-xl"
+            >
+              Back
+            </button>
+          )}
+          
+          {currentStep < FlowStep.DOCTOR_DASHBOARD && currentStep !== FlowStep.LANDING && (
+            <button
+              onClick={goToNextStep}
+              className="px-4 py-2 bg-primary text-white rounded-xl ml-auto"
+            >
+              Continue
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
