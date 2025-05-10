@@ -4,9 +4,11 @@ import ChatBot from "@/components/ChatBot";
 import BoardingPass from "@/components/BoardingPass";
 import DoctorDashboard from "@/components/DoctorDashboard";
 import BonusProgramStep from "@/components/BonusProgramStep";
+import StartCheckIn from "@/components/StartCheckIn";
 
 // Main flow steps
 enum FlowStep {
+  START_CHECKIN,
   CHATBOT,
   BONUS_PROGRAM,
   BOARDING_PASS,
@@ -14,7 +16,7 @@ enum FlowStep {
 }
 
 const Index = () => {
-  const [currentStep, setCurrentStep] = useState<FlowStep>(FlowStep.CHATBOT);
+  const [currentStep, setCurrentStep] = useState<FlowStep>(FlowStep.START_CHECKIN);
 
   // Function to navigate to next step
   const goToNextStep = () => {
@@ -48,12 +50,15 @@ const Index = () => {
                 key={step}
                 className={`w-full h-1 ${
                   Number(step) <= currentStep ? "bg-primary" : "bg-gray-200"
-                } ${index < 3 ? "mr-1" : ""}`}
+                } ${index < 4 ? "mr-1" : ""}`}
               />
             ))}
         </div>
 
         {/* Current step component */}
+        {currentStep === FlowStep.START_CHECKIN && (
+          <StartCheckIn onComplete={goToNextStep} />
+        )}
         {currentStep === FlowStep.CHATBOT && (
           <ChatBot onComplete={goToNextStep} />
         )}
@@ -67,26 +72,28 @@ const Index = () => {
           <DoctorDashboard />
         )}
 
-        {/* Navigation buttons */}
-        <div className="mt-8 flex justify-between">
-          {currentStep > FlowStep.CHATBOT && (
-            <button
-              onClick={() => setCurrentStep(prev => prev - 1)}
-              className="px-4 py-2 border border-primary text-primary rounded-xl"
-            >
-              Back
-            </button>
-          )}
-          
-          {currentStep < FlowStep.DOCTOR_DASHBOARD && (
-            <button
-              onClick={goToNextStep}
-              className="px-4 py-2 bg-primary text-white rounded-xl ml-auto"
-            >
-              Continue
-            </button>
-          )}
-        </div>
+        {/* Navigation buttons - Only show for steps after START_CHECKIN */}
+        {currentStep > FlowStep.START_CHECKIN && (
+          <div className="mt-8 flex justify-between">
+            {currentStep > FlowStep.START_CHECKIN && (
+              <button
+                onClick={() => setCurrentStep(prev => prev - 1)}
+                className="px-4 py-2 border border-primary text-primary rounded-xl"
+              >
+                Back
+              </button>
+            )}
+            
+            {currentStep < FlowStep.DOCTOR_DASHBOARD && (
+              <button
+                onClick={goToNextStep}
+                className="px-4 py-2 bg-primary text-white rounded-xl ml-auto"
+              >
+                Continue
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
