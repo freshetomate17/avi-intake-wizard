@@ -112,13 +112,6 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
       )}
 
       <div className="flex justify-end mt-auto">
-        <button
-          onClick={onComplete}
-          className="px-4 py-2 bg-primary text-white rounded-xl"
-          disabled={uploadedFiles.length === 0}
-        >
-          Next
-        </button>
       </div>
     </div>
   );

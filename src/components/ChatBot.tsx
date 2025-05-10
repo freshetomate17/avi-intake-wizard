@@ -379,12 +379,6 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
 
       {/* Next button (previously Continue button) */}
       <div className="flex justify-end">
-        <button
-          onClick={onComplete}
-          className="px-4 py-2 bg-primary text-white rounded-xl"
-        >
-          Next
-        </button>
       </div>
     </div>
   );

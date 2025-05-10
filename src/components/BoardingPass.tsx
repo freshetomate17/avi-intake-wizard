@@ -162,15 +162,6 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
       )}
 
       <div className="flex justify-end mt-auto">
-        <button
-          onClick={onComplete}
-          className={`px-4 py-2 bg-primary text-white rounded-xl ${
-            !isGenerated ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          disabled={!isGenerated}
-        >
-          Next
-        </button>
       </div>
     </div>
   );

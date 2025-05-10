@@ -99,12 +99,6 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete, onProgr
       </div>
       
       <div className="flex justify-end mt-4">
-        <button
-          onClick={handleComplete}
-          className="px-4 py-2 bg-primary text-white rounded-xl"
-        >
-          Next
-        </button>
       </div>
     </div>
   );
