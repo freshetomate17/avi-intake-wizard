@@ -39,6 +39,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   const questions = [
     "Was ist Ihr Geburtsdatum? (TT/MM/JJJJ)",
     "Was ist der Grund für Ihren Besuch heute?",
+    "Bitte fassen Sie Ihre Beschwerden so konkret wie möglich in einem Satz zusammen."
   ];
 
   const handleSend = () => {
