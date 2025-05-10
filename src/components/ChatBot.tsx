@@ -1,7 +1,9 @@
-import React, { useState, useRef } from "react";
+
+import React, { useState, useRef, useEffect } from "react";
 import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 interface Message {
   id: number;
@@ -35,6 +37,22 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  // Speech recognition setup
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable
+  } = useSpeechRecognition();
+
+  // Update input field when transcript changes
+  useEffect(() => {
+    if (transcript && isRecording) {
+      setInput(transcript);
+    }
+  }, [transcript, isRecording]);
+
   // Questions flow
   const questions = [
     "What is your date of birth? (DD/MM/YYYY)",
@@ -53,6 +71,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
 
     setMessages(newMessages);
     setInput("");
+    resetTranscript();
 
     // Add bot response after a short delay
     if (step < questions.length - 1) {
@@ -85,13 +104,32 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   };
 
   const startRecording = () => {
+    if (!browserSupportsSpeechRecognition) {
+      toast({
+        title: "Error",
+        description: "Your browser doesn't support speech recognition.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isMicrophoneAvailable) {
+      toast({
+        title: "Microphone Access",
+        description: "Please allow microphone access to use voice input.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsRecording(true);
-    
-    // Simulate recording for 2 seconds
-    setTimeout(() => {
-      setIsRecording(false);
-      setInput("This is a simulated voice input");
-    }, 2000);
+    resetTranscript();
+    SpeechRecognition.startListening({ continuous: true });
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    SpeechRecognition.stopListening();
   };
 
   const triggerFileUpload = () => {
@@ -158,6 +196,15 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     }, 2000);
   };
 
+  // Show browser compatibility message if speech recognition is not supported
+  if (!browserSupportsSpeechRecognition) {
+    toast({
+      title: "Browser not supported",
+      description: "Your browser doesn't support speech recognition. Please use Chrome for the best experience.",
+      variant: "destructive",
+    });
+  }
+
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digital Check-in</h2>
@@ -166,7 +213,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
       <div className="bg-primary/10 rounded-lg p-3 mb-4 flex items-center border border-primary/20">
         <Mic className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
         <p className="text-sm">
-          <span className="font-medium">Voice-enabled assistant:</span> You can communicate with Ava primarily through voice. This chat is for reviewing the conversation.
+          <span className="font-medium">Voice-enabled assistant:</span> You can communicate with Ava through voice. Click the microphone button to start or stop recording.
         </p>
       </div>
       
@@ -178,7 +225,17 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </p>
       </div>
       
-      {/* Ava animation - updated to use the new image */}
+      {/* Microphone status indicator when recording */}
+      {isRecording && (
+        <div className="bg-red-50 rounded-lg p-3 mb-4 flex items-center border border-red-200">
+          <Mic className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 animate-pulse" />
+          <p className="text-sm">
+            <span className="font-medium">Recording:</span> Speak clearly into your microphone. Click the microphone button again to stop.
+          </p>
+        </div>
+      )}
+      
+      {/* Ava animation */}
       <div className="flex justify-center mb-6">
         <div className="w-64 h-64 rounded-full overflow-hidden">
           <img
@@ -255,7 +312,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           <Camera size={24} />
         </button>
         <button
-          onClick={isRecording ? () => setIsRecording(false) : startRecording}
+          onClick={isRecording ? stopRecording : startRecording}
           className={`p-2 rounded-full mr-2 ${
             isRecording ? "bg-red-500 text-white" : "bg-gray-200 hover:bg-gray-300"
           } flex items-center justify-center`}
