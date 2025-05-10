@@ -10,44 +10,44 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
   const programs: ProgramProps[] = [
     {
       id: "hausarzt-plus",
-      title: "avi Hausarzt Plus",
-      subtitle: "Profitieren Sie von exklusiven Zusatzleistungen",
+      title: "avi Primary Care Plus",
+      subtitle: "Benefit from exclusive additional services",
       features: [
-        { text: "Regelmäßige Vorsorge – jährliche Blutbilder & zweijährige Vorsorge" },
-        { text: "Medizinischer Rückrufservice – Rezepte, Überweisungen & Krankschreibung" },
-        { text: "Schnellere Beantwortung Ihrer Anfragen – prioritierter Support" }
+        { text: "Regular preventive care – annual blood tests & biannual check-ups" },
+        { text: "Medical callback service – prescriptions, referrals & sick notes" },
+        { text: "Faster response to your inquiries – prioritized support" }
       ],
-      detailsDescription: "Mit avi Hausarzt Plus bieten wir Ihnen ein umfassendes Vorsorgeprogramm. Sie erhalten jährliche Blutuntersuchungen und zweijährliche ausführliche Vorsorgeuntersuchungen, die über die Kassenleistung hinausgehen. Unser medizinischer Rückrufservice ermöglicht Ihnen, Rezepte, Überweisungen und Krankschreibungen bequem anzufordern, ohne persönlich in die Praxis kommen zu müssen. Zusätzlich genießen Sie einen priorisierten Support bei all Ihren Anfragen.",
-      monthlyFee: "9,99€",
+      detailsDescription: "With avi Primary Care Plus, we offer you a comprehensive preventive care program. You'll receive annual blood tests and biannual detailed preventive examinations that go beyond standard insurance coverage. Our medical callback service allows you to conveniently request prescriptions, referrals, and sick notes without having to come to the practice in person. Additionally, you'll enjoy prioritized support for all your inquiries.",
+      monthlyFee: "9.99€",
       benefits: [
-        "Umfassende Gesundheitsvorsorge über die Kassenleistung hinaus",
-        "Zeitersparnis durch digitale Services",
-        "Bevorzugte Terminvergabe bei Spezialisten"
+        "Comprehensive healthcare beyond standard insurance coverage",
+        "Time savings through digital services",
+        "Preferred appointment scheduling with specialists"
       ]
     },
     {
       id: "impact",
       title: "avi Impact",
-      subtitle: "Verbessern Sie Ihre Gesundheit kontinuierlich",
+      subtitle: "Continuously improve your health",
       features: [
-        { text: "Remote Monitoring – regelmäßige Messung Ihrer Gesundheitsdaten" },
-        { text: "Telemedizin – Begleitung durch Teleärzt:innen & MFAs" },
-        { text: "Therapieoptimierung – Lebensstilinterventionen & Kontrolle" }
+        { text: "Remote Monitoring – regular measurement of your health data" },
+        { text: "Telemedicine – support from teledoctors & medical assistants" },
+        { text: "Therapy optimization – lifestyle interventions & monitoring" }
       ],
-      detailsDescription: "avi Impact ist unser innovatives Programm zur kontinuierlichen Gesundheitsverbesserung. Mit Remote Monitoring werden Ihre Gesundheitsdaten regelmäßig erfasst und ausgewertet, um frühzeitig Veränderungen zu erkennen. Unsere Teleärzte und medizinischen Fachangestellten stehen Ihnen für alle Fragen zur Verfügung und bieten professionelle Begleitung. Die Therapieoptimierung beinhaltet personalisierte Lebensstilinterventionen und regelmäßige Kontrollen Ihrer Gesundheitsparameter.",
-      monthlyFee: "14,99€",
+      detailsDescription: "avi Impact is our innovative program for continuous health improvement. With Remote Monitoring, your health data is regularly collected and evaluated to detect changes early. Our teledoctors and medical assistants are available to answer all your questions and provide professional guidance. Therapy optimization includes personalized lifestyle interventions and regular monitoring of your health parameters.",
+      monthlyFee: "14.99€",
       benefits: [
-        "Frühzeitige Erkennung gesundheitlicher Veränderungen",
-        "Persönlicher Gesundheitscoach",
-        "Individuell angepasste Therapiepläne",
-        "Digitale Dokumentation Ihrer Gesundheitsentwicklung"
+        "Early detection of health changes",
+        "Personal health coach",
+        "Individually tailored therapy plans",
+        "Digital documentation of your health development"
       ]
     }
   ];
 
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-2xl font-serif font-bold mb-4">Bonus Programme</h2>
+      <h2 className="text-2xl font-serif font-bold mb-4">Bonus Programs</h2>
       
       <div className="flex-grow">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -71,7 +71,7 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
           onClick={onComplete}
           className="px-4 py-2 bg-primary text-white rounded-xl"
         >
-          Weiter
+          Next
         </button>
       </div>
     </div>

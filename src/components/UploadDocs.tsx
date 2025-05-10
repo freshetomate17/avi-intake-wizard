@@ -47,11 +47,11 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">
-        Bitte laden Sie Ihre Dokumente hoch
+        Please upload your documents
       </h2>
       
       <p className="mb-6 text-gray-700">
-        Um Ihre Anmeldung zu vervollständigen, laden Sie bitte Ihre Versicherungskarte und ärztlichen Überweisungen hoch.
+        To complete your registration, please upload your insurance card and any medical referrals.
       </p>
 
       {/* Upload area */}
@@ -66,10 +66,10 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
       >
         <Upload className="h-12 w-12 text-gray-400 mb-4" />
         <p className="text-lg font-medium mb-1">
-          Dateien hierher ziehen oder klicken zum Auswählen
+          Drag files here or click to browse
         </p>
         <p className="text-sm text-gray-500">
-          Unterstützt werden PDF, JPG und PNG (max. 10MB)
+          Supports PDF, JPG and PNG (max. 10MB)
         </p>
         <input
           id="fileInput"
@@ -84,7 +84,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
       {/* Uploaded files list */}
       {uploadedFiles.length > 0 && (
         <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h3 className="font-medium mb-2">Hochgeladene Dateien</h3>
+          <h3 className="font-medium mb-2">Uploaded Files</h3>
           {uploadedFiles.map((file, index) => (
             <div
               key={`${file.name}-${index}`}
@@ -103,7 +103,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
                   }}
                   className="text-red-500 text-sm hover:text-red-700"
                 >
-                  Entfernen
+                  Remove
                 </button>
               </div>
             </div>
@@ -117,7 +117,7 @@ const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
           className="px-4 py-2 bg-primary text-white rounded-xl"
           disabled={uploadedFiles.length === 0}
         >
-          Weiter
+          Next
         </button>
       </div>
     </div>

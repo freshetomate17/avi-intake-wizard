@@ -19,27 +19,27 @@ const DoctorDashboard: React.FC = () => {
     {
       id: 1,
       patient: "Max Mustermann",
-      date: "12. Mai 2025",
+      date: "May 12, 2025",
       time: "10:30",
-      type: "Routineuntersuchung",
+      type: "Routine check-up",
       status: "confirmed",
-      bonusProgram: "avi Hausarzt Plus",
+      bonusProgram: "avi Primary Care Plus",
     },
     {
       id: 2,
       patient: "Anna Schmidt",
-      date: "12. Mai 2025",
+      date: "May 12, 2025",
       time: "11:45",
-      type: "Erstberatung",
+      type: "Initial consultation",
       status: "confirmed",
       bonusProgram: "avi Impact",
     },
     {
       id: 3,
       patient: "Thomas Weber",
-      date: "12. Mai 2025",
+      date: "May 12, 2025",
       time: "13:15",
-      type: "Nachsorge",
+      type: "Follow-up",
       status: "pending",
       bonusProgram: null,
     },
@@ -49,24 +49,24 @@ const DoctorDashboard: React.FC = () => {
     {
       id: 101,
       patient: "Max Mustermann",
-      date: "15. April 2025",
+      date: "April 15, 2025",
       time: "09:15",
-      type: "Blutuntersuchung",
+      type: "Blood test",
       status: "completed",
-      bonusProgram: "avi Hausarzt Plus",
+      bonusProgram: "avi Primary Care Plus",
     },
     {
       id: 102,
       patient: "Erika Meyer",
-      date: "28. April 2025",
+      date: "April 28, 2025",
       time: "14:30",
-      type: "Impfung",
+      type: "Vaccination",
       status: "completed",
       bonusProgram: null,
     },
   ];
 
-  // Get the active bonus program name, or "Keines genutzt" if none is active
+  // Get the active bonus program name, or "None used" if none is active
   const getActiveBonusProgram = () => {
     const allAppointments = [...upcomingAppointments, ...historyAppointments];
     const activeBonusPrograms = allAppointments
@@ -77,7 +77,7 @@ const DoctorDashboard: React.FC = () => {
       // Return the first active program if there are multiple (for simplicity)
       return activeBonusPrograms[0];
     } else {
-      return "Keines genutzt";
+      return "None used";
     }
   };
 
@@ -86,19 +86,19 @@ const DoctorDashboard: React.FC = () => {
       case "confirmed":
         return (
           <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200 hover:bg-green-100">
-            Bestätigt
+            Confirmed
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100">
-            Ausstehend
+            Pending
           </Badge>
         );
       case "completed":
         return (
           <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-100">
-            Abgeschlossen
+            Completed
           </Badge>
         );
       default:
@@ -110,7 +110,7 @@ const DoctorDashboard: React.FC = () => {
     if (!program) {
       return (
         <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-100">
-          Kein Programm
+          No Program
         </Badge>
       );
     }
@@ -126,7 +126,7 @@ const DoctorDashboard: React.FC = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-serif font-bold">Arzt Dashboard</h2>
+        <h2 className="text-2xl font-serif font-bold">Doctor Dashboard</h2>
         <div className="flex items-center space-x-2">
           <User className="h-5 w-5 text-gray-700" />
           <span className="font-medium">Dr. Julia Schmidt</span>
@@ -140,7 +140,7 @@ const DoctorDashboard: React.FC = () => {
             <Calendar className="h-6 w-6 text-blue-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Termine heute</p>
+            <p className="text-sm text-gray-500">Appointments today</p>
             <p className="text-2xl font-bold">8</p>
           </div>
         </div>
@@ -150,8 +150,8 @@ const DoctorDashboard: React.FC = () => {
             <Clock className="h-6 w-6 text-green-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Nächster Termin</p>
-            <p className="text-lg font-bold">10:30 Uhr</p>
+            <p className="text-sm text-gray-500">Next appointment</p>
+            <p className="text-lg font-bold">10:30 AM</p>
           </div>
         </div>
 
@@ -160,7 +160,7 @@ const DoctorDashboard: React.FC = () => {
             <Award className="h-6 w-6 text-purple-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Bonusprogramm</p>
+            <p className="text-sm text-gray-500">Bonus program</p>
             <p className="text-lg font-bold">{getActiveBonusProgram()}</p>
           </div>
         </div>
@@ -177,7 +177,7 @@ const DoctorDashboard: React.FC = () => {
             }`}
             onClick={() => setActiveTab("upcoming")}
           >
-            Anstehende Termine
+            Upcoming Appointments
           </button>
           <button
             className={`pb-2 px-1 ${
@@ -187,7 +187,7 @@ const DoctorDashboard: React.FC = () => {
             }`}
             onClick={() => setActiveTab("history")}
           >
-            Terminhistorie
+            Appointment History
           </button>
         </div>
       </div>
@@ -198,11 +198,11 @@ const DoctorDashboard: React.FC = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Patient</TableHead>
-              <TableHead>Datum & Zeit</TableHead>
-              <TableHead>Typ</TableHead>
+              <TableHead>Date & Time</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Bonusprogramm</TableHead>
-              <TableHead>Aktionen</TableHead>
+              <TableHead>Bonus Program</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

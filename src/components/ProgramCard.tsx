@@ -33,11 +33,11 @@ const ProgramCard: React.FC<ProgramProps> = ({
   const { toast } = useToast();
 
   const enrollInProgram = (programId: string) => {
-    // Stub method - would integrate with FHIR extension / Krankenkasse enrollment API
+    // Stub method - would integrate with FHIR extension / Insurance enrollment API
     console.info(`User requested enrollment in ${programId}`);
     toast({
-      title: "Programm aktiviert",
-      description: `Sie wurden erfolgreich für ${title} angemeldet.`,
+      title: "Program activated",
+      description: `You have successfully enrolled in ${title}.`,
     });
   };
 
@@ -64,14 +64,14 @@ const ProgramCard: React.FC<ProgramProps> = ({
             className="border-primary text-primary flex-1"
             onClick={() => setShowDetails(true)}
           >
-            Mehr Infos
+            More Info
           </Button>
           <Button 
             variant="default"
             className="bg-primary text-white flex-1"
             onClick={() => enrollInProgram(id)}
           >
-            Jetzt aktivieren
+            Activate Now
           </Button>
         </CardFooter>
       </Card>
@@ -90,14 +90,14 @@ const ProgramCard: React.FC<ProgramProps> = ({
             
             {monthlyFee && (
               <div className="mt-4">
-                <p className="font-medium">Monatlicher Beitrag:</p>
+                <p className="font-medium">Monthly Fee:</p>
                 <p className="font-bold text-primary text-lg">{monthlyFee}</p>
               </div>
             )}
             
             {benefits && benefits.length > 0 && (
               <div className="mt-4">
-                <p className="font-medium mb-2">Ihre Vorteile:</p>
+                <p className="font-medium mb-2">Your Benefits:</p>
                 <ul className="space-y-2">
                   {benefits.map((benefit, index) => (
                     <li key={index} className="flex items-start">
@@ -110,7 +110,7 @@ const ProgramCard: React.FC<ProgramProps> = ({
             )}
             
             <p className="text-sm text-muted-foreground mt-4">
-              Für detailliertere Informationen oder bei Fragen kontaktieren Sie bitte unser Service-Team.
+              For more detailed information or if you have questions, please contact our service team.
             </p>
             
             <div className="flex justify-end pt-4">
@@ -122,7 +122,7 @@ const ProgramCard: React.FC<ProgramProps> = ({
                   setShowDetails(false);
                 }}
               >
-                Jetzt aktivieren
+                Activate Now
               </Button>
             </div>
           </div>
