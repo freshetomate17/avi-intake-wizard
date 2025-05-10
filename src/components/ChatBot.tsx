@@ -75,6 +75,35 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
     sendInitialDetails();
   }, [toast]);
 
+  useEffect(() => {
+    if (!("speechSynthesis" in window)) return;
+    if (messages.length === 0) return;
+    const last = messages[messages.length - 1];
+    if (last.sender !== "bot") return;
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utter = new SpeechSynthesisUtterance(last.text);
+    // Use browser language or fallback
+    utter.lang = navigator.language || "en-US";
+
+    // Attempt to select a matching voice
+    const loadAndSpeak = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        const voice = voices.find(v => v.lang.startsWith(utter.lang)) || voices[0];
+        utter.voice = voice;
+        window.speechSynthesis.speak(utter);
+      }
+    };
+
+    // Some mobile browsers emit voiceschanged event
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.addEventListener("voiceschanged", loadAndSpeak);
+    }
+    loadAndSpeak();
+  }, [messages]);
+
   const sendInitialDetails = async () => {
     setIsLoadingChat(true);
     const details = `Name: ${name}\nDate of Birth: ${birthdate}\nReason for Visit: ${reason}`;
