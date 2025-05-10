@@ -33,19 +33,23 @@ const StartCheckIn: React.FC<StartCheckInProps> = ({ onComplete }) => {
       
       <div className="flex-grow flex flex-col items-center justify-center text-center px-4 py-8 md:py-12">
         <h1 className="text-2xl md:text-3xl font-serif font-bold mb-4">
-          Digitaler Check-in starten
+          Digital Check-in
         </h1>
         
-        <p className="text-base md:text-lg text-gray-600 mb-8 max-w-md">
-          In wenigen Schritten erfassen Sie Ihre Daten sicher und schnell.
-        </p>
+        <div className="text-base md:text-lg text-gray-600 mb-8 max-w-md space-y-4">
+          <p>Hi and welcome to avi! We're glad you're here. 🙂</p>
+          
+          <p>Since this is your first visit with us, we'd like to get to know you a little better. Please complete the check-in process below. When you're finished, you'll receive your boarding pass. 🪪</p>
+          
+          <p>With this pass, you can check in independently when you visit us!</p>
+        </div>
         
         <div className="flex flex-col items-center mt-6">
           <Button 
             onClick={handleStartCheckIn}
             className="rounded-3xl py-6 px-8 text-base flex gap-2 shadow-md hover:shadow-lg transition-all"
           >
-            Jetzt starten
+            Start now
             <ChevronRight className="ml-1" />
           </Button>
           
@@ -55,7 +59,7 @@ const StartCheckIn: React.FC<StartCheckInProps> = ({ onComplete }) => {
             className="text-primary mt-4 flex items-center gap-1"
           >
             <Info className="h-4 w-4" />
-            Mehr erfahren
+            Learn more
           </Button>
         </div>
       </div>
@@ -64,24 +68,24 @@ const StartCheckIn: React.FC<StartCheckInProps> = ({ onComplete }) => {
       <Dialog open={showInfoDialog} onOpenChange={setShowInfoDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-serif">Über den Check-in Prozess</DialogTitle>
+            <DialogTitle className="font-serif">About the Check-in Process</DialogTitle>
             <DialogDescription>
-              Der digitale Check-in von avi ermöglicht es Ihnen, alle notwendigen Daten vor Ihrem Arztbesuch bequem einzugeben.
+              avi's digital check-in allows you to conveniently enter all necessary data before your doctor's appointment.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <p className="text-sm text-gray-600">
-              In diesem Prozess werden Sie:
+              During this process, you will:
             </p>
             <ul className="list-disc pl-5 space-y-2 text-sm">
-              <li>Ihre persönlichen Daten bestätigen</li>
-              <li>Informationen zu Ihrem Besuchsgrund angeben</li>
-              <li>Relevante Dokumente hochladen</li>
-              <li>Optional Bonus-Programme kennenlernen</li>
-              <li>Ihre digitale Boardingkarte erhalten</li>
+              <li>Confirm your personal information</li>
+              <li>Provide details about the reason for your visit</li>
+              <li>Upload relevant documents</li>
+              <li>Optionally learn about bonus programs</li>
+              <li>Receive your digital boarding pass</li>
             </ul>
             <p className="text-sm text-gray-600 mt-4">
-              Alle Ihre Daten werden verschlüsselt übertragen und gemäß den deutschen Datenschutzbestimmungen verarbeitet.
+              All your data is transmitted securely and processed in accordance with data protection regulations.
             </p>
           </div>
         </DialogContent>

@@ -19,12 +19,12 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Willkommen zum digitalen Check-in! Ich bin Ava, Ihre digitale Assistentin. Ich werde Ihnen beim Check-in-Prozess helfen. 😊",
+      text: "Welcome to the digital check-in! I'm Ava, your digital assistant. I'll help you with the check-in process. 😊",
       sender: "bot",
     },
     {
       id: 2,
-      text: "Was ist Ihr vollständiger Name?",
+      text: "What is your full name?",
       sender: "bot",
     }
   ]);
@@ -37,9 +37,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
 
   // Questions flow
   const questions = [
-    "Was ist Ihr Geburtsdatum? (TT/MM/JJJJ)",
-    "Was ist der Grund für Ihren Besuch heute?",
-    "Bitte fassen Sie Ihre Beschwerden so konkret wie möglich in einem Satz zusammen."
+    "What is your date of birth? (DD/MM/YYYY)",
+    "What is the reason for your visit today?",
+    "Please summarize your concerns as concretely as possible in one sentence."
   ];
 
   const handleSend = () => {
@@ -76,7 +76,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           ...prev,
           {
             id: prev.length + 1,
-            text: "Vielen Dank! Ihre Check-in-Informationen wurden erfasst.",
+            text: "Thank you! Your check-in information has been recorded.",
             sender: "bot",
           },
         ]);
@@ -90,7 +90,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     // Simulate recording for 2 seconds
     setTimeout(() => {
       setIsRecording(false);
-      setInput("Dies ist eine simulierte Spracheingabe");
+      setInput("This is a simulated voice input");
     }, 2000);
   };
 
@@ -113,7 +113,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
       ...prev,
       { 
         id: prev.length + 1, 
-        text: "Dokument hochgeladen", 
+        text: "Document uploaded", 
         sender: "user",
         documentUrl: objectUrl,
         documentName: file.name
@@ -131,13 +131,13 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
       setIsAnalyzing(false);
       
       // Determine document type based on filename
-      let docType = "Unbekanntes Dokument";
-      if (file.name.toLowerCase().includes("versicherung")) {
-        docType = "Versicherungskarte";
-      } else if (file.name.toLowerCase().includes("überweisung")) {
-        docType = "Ärztliche Überweisung";
-      } else if (file.name.toLowerCase().includes("befund")) {
-        docType = "Ärztlicher Befund";
+      let docType = "Unknown document";
+      if (file.name.toLowerCase().includes("insurance")) {
+        docType = "Insurance card";
+      } else if (file.name.toLowerCase().includes("referral")) {
+        docType = "Doctor's referral";
+      } else if (file.name.toLowerCase().includes("report")) {
+        docType = "Medical report";
       }
       
       // Add bot response with document analysis
@@ -145,22 +145,22 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         ...prev,
         {
           id: prev.length + 1,
-          text: `Ich habe Ihr Dokument analysiert. Es handelt sich um: ${docType}. Ist das korrekt?`,
+          text: `I've analyzed your document. It appears to be: ${docType}. Is this correct?`,
           sender: "bot",
         },
       ]);
       
       // Show toast notification
       toast({
-        title: "Dokument analysiert",
-        description: `Dokument wurde als ${docType} erkannt`,
+        title: "Document analyzed",
+        description: `Document recognized as ${docType}`,
       });
     }, 2000);
   };
 
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-2xl font-serif font-bold mb-4">Digitaler Check-in</h2>
+      <h2 className="text-2xl font-serif font-bold mb-4">Digital Check-in</h2>
       
       {/* Ava animation - centered and large, border removed */}
       <div className="flex justify-center mb-6">
@@ -220,7 +220,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           <div className="flex justify-start mb-2">
             <div className="bg-white border border-gray-300 p-3 rounded-lg">
               <div className="flex items-center">
-                <span className="mr-2">Dokument wird analysiert</span>
+                <span className="mr-2">Analyzing document</span>
                 <div className="flex space-x-1">
                   <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                   <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
@@ -270,7 +270,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Geben Sie Ihre Antwort ein..."
+          placeholder="Enter your response..."
           className="flex-grow border rounded-lg p-2"
         />
         <button
@@ -292,7 +292,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           onClick={onComplete}
           className="px-4 py-2 bg-primary text-white rounded-xl"
         >
-          Weiter
+          Continue
         </button>
       </div>
     </div>

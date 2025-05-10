@@ -20,12 +20,12 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <h2 className="text-2xl font-serif font-bold mb-4">Ihr digitaler Termin-Pass</h2>
+      <h2 className="text-2xl font-serif font-bold mb-4">Your Digital Boarding Pass</h2>
 
       {!isGenerated ? (
         <div className="flex flex-col items-center justify-center flex-grow">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-          <p className="text-gray-700">Ihr Termin-Pass wird generiert...</p>
+          <p className="text-gray-700">Generating your boarding pass...</p>
         </div>
       ) : (
         <div className="flex-grow flex flex-col">
@@ -33,7 +33,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
           <div className="bg-white rounded-lg border shadow-lg overflow-hidden mb-6">
             {/* Header with Logo */}
             <div className="bg-primary text-white p-4 flex justify-between items-center">
-              <h3 className="text-xl font-bold">Termin bestätigt</h3>
+              <h3 className="text-xl font-bold">Appointment Confirmed</h3>
               <img src="/avi-logo.png" alt="avi logo" className="h-8" />
             </div>
 
@@ -43,26 +43,26 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
                 <User className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
                   <p className="text-sm text-gray-500">Patient</p>
-                  <p className="font-medium">Max Mustermann</p>
+                  <p className="font-medium">John Doe</p>
                 </div>
               </div>
 
               <div className="flex items-center mb-4">
                 <Calendar className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
-                  <p className="text-sm text-gray-500">Termin</p>
-                  <p className="font-medium">Montag, 12. Mai 2025</p>
-                  <p className="font-medium">10:30 Uhr</p>
+                  <p className="text-sm text-gray-500">Appointment</p>
+                  <p className="font-medium">Monday, May 12, 2025</p>
+                  <p className="font-medium">10:30 AM</p>
                 </div>
               </div>
 
               <div className="flex items-center mb-6">
                 <MapPin className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
-                  <p className="text-sm text-gray-500">Ort</p>
-                  <p className="font-medium">Dr. med. Julia Schmidt</p>
-                  <p className="text-sm">Praxis für Allgemeinmedizin</p>
-                  <p className="text-sm">Hauptstraße 123, 10115 Berlin</p>
+                  <p className="text-sm text-gray-500">Location</p>
+                  <p className="font-medium">Dr. Julia Schmidt</p>
+                  <p className="text-sm">General Medicine Practice</p>
+                  <p className="text-sm">123 Main Street, 10115 Berlin</p>
                 </div>
               </div>
 
@@ -105,24 +105,24 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
 
           {/* Instructions */}
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h4 className="font-medium mb-2">Hinweise:</h4>
+            <h4 className="font-medium mb-2">Notes:</h4>
             <ul className="space-y-2">
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                 <span className="text-sm text-gray-700">
-                  Bitte zeigen Sie diesen Pass bei Ihrer Ankunft vor
+                  Please show this pass upon arrival
                 </span>
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                 <span className="text-sm text-gray-700">
-                  Erscheinen Sie bitte 10 Minuten vor Ihrem Termin
+                  Please arrive 10 minutes before your appointment
                 </span>
               </li>
               <li className="flex items-start">
                 <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                 <span className="text-sm text-gray-700">
-                  Bringen Sie Ihre Versicherungskarte und andere relevante Dokumente mit
+                  Bring your insurance card and other relevant documents
                 </span>
               </li>
             </ul>
@@ -138,7 +138,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
           }`}
           disabled={!isGenerated}
         >
-          Weiter
+          Continue
         </button>
       </div>
     </div>
