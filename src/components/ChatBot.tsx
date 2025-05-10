@@ -72,7 +72,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
         toast({
           title: "Speech Recognition Error",
           description: err.error,
-          variant: "destructive",
+          variant: "destructive", // Changed from "warning" to "destructive"
         });
         setIsRecording(false);
       };
