@@ -19,9 +19,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Willkommen zum digitalen Check-in! Ich bin Ava, Ihre digitale Assistentin. Ich werde Ihnen helfen, den Check-in-Prozess abzuschließen. Was ist Ihr vollständiger Name?",
+      text: "Willkommen zum digitalen Check-in! Ich bin Ava, Ihre digitale Assistentin. Ich werde Ihnen beim Check-in-Prozess helfen.",
       sender: "bot",
     },
+    {
+      id: 2,
+      text: "Was ist Ihr vollständiger Name?",
+      sender: "bot",
+    }
   ]);
   const [input, setInput] = useState("");
   const [step, setStep] = useState(0);
@@ -32,7 +37,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
 
   // Questions flow
   const questions = [
-    "Was ist Ihr vollständiger Name?",
     "Was ist Ihr Geburtsdatum? (TT/MM/JJJJ)",
     "Was ist der Grund für Ihren Besuch heute?",
   ];
