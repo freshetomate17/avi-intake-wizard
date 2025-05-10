@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Calendar, Clock, User, FileText } from "lucide-react";
+import { Calendar, Clock, User, FileText, Award } from "lucide-react";
 
 const DoctorDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
@@ -14,6 +14,7 @@ const DoctorDashboard: React.FC = () => {
       time: "10:30",
       type: "Routineuntersuchung",
       status: "confirmed",
+      bonusProgram: "avi Hausarzt Plus",
     },
     {
       id: 2,
@@ -22,6 +23,7 @@ const DoctorDashboard: React.FC = () => {
       time: "11:45",
       type: "Erstberatung",
       status: "confirmed",
+      bonusProgram: "avi Impact",
     },
     {
       id: 3,
@@ -30,6 +32,7 @@ const DoctorDashboard: React.FC = () => {
       time: "13:15",
       type: "Nachsorge",
       status: "pending",
+      bonusProgram: null,
     },
   ];
 
@@ -41,6 +44,7 @@ const DoctorDashboard: React.FC = () => {
       time: "09:15",
       type: "Blutuntersuchung",
       status: "completed",
+      bonusProgram: "avi Hausarzt Plus",
     },
     {
       id: 102,
@@ -49,6 +53,7 @@ const DoctorDashboard: React.FC = () => {
       time: "14:30",
       type: "Impfung",
       status: "completed",
+      bonusProgram: null,
     },
   ];
 
@@ -75,6 +80,17 @@ const DoctorDashboard: React.FC = () => {
       default:
         return null;
     }
+  };
+
+  const getBonusProgramBadge = (program: string | null) => {
+    if (!program) return null;
+    
+    return (
+      <span className="flex items-center px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full gap-1">
+        <Award className="h-3 w-3" />
+        {program}
+      </span>
+    );
   };
 
   return (
@@ -111,11 +127,11 @@ const DoctorDashboard: React.FC = () => {
 
         <div className="bg-white p-4 rounded-lg shadow flex items-center">
           <div className="rounded-full bg-purple-100 p-3 mr-4">
-            <FileText className="h-6 w-6 text-purple-600" />
+            <Award className="h-6 w-6 text-purple-600" />
           </div>
           <div>
-            <p className="text-sm text-gray-500">Neue Dokumente</p>
-            <p className="text-2xl font-bold">3</p>
+            <p className="text-sm text-gray-500">Bonusprogramm-Teilnehmer</p>
+            <p className="text-2xl font-bold">4</p>
           </div>
         </div>
       </div>
@@ -164,6 +180,9 @@ const DoctorDashboard: React.FC = () => {
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Bonusprogramm
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Aktionen
               </th>
             </tr>
@@ -186,6 +205,9 @@ const DoctorDashboard: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(appointment.status)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getBonusProgramBadge(appointment.bonusProgram)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button className="text-primary hover:text-primary-dark">

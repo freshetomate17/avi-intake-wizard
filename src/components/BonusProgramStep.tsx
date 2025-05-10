@@ -16,6 +16,13 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
         { text: "Regelmäßige Vorsorge – jährliche Blutbilder & zweijährige Vorsorge" },
         { text: "Medizinischer Rückrufservice – Rezepte, Überweisungen & Krankschreibung" },
         { text: "Schnellere Beantwortung Ihrer Anfragen – prioritierter Support" }
+      ],
+      detailsDescription: "Mit avi Hausarzt Plus bieten wir Ihnen ein umfassendes Vorsorgeprogramm. Sie erhalten jährliche Blutuntersuchungen und zweijährliche ausführliche Vorsorgeuntersuchungen, die über die Kassenleistung hinausgehen. Unser medizinischer Rückrufservice ermöglicht Ihnen, Rezepte, Überweisungen und Krankschreibungen bequem anzufordern, ohne persönlich in die Praxis kommen zu müssen. Zusätzlich genießen Sie einen priorisierten Support bei all Ihren Anfragen.",
+      monthlyFee: "9,99€",
+      benefits: [
+        "Umfassende Gesundheitsvorsorge über die Kassenleistung hinaus",
+        "Zeitersparnis durch digitale Services",
+        "Bevorzugte Terminvergabe bei Spezialisten"
       ]
     },
     {
@@ -26,6 +33,14 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
         { text: "Remote Monitoring – regelmäßige Messung Ihrer Gesundheitsdaten" },
         { text: "Telemedizin – Begleitung durch Teleärzt:innen & MFAs" },
         { text: "Therapieoptimierung – Lebensstilinterventionen & Kontrolle" }
+      ],
+      detailsDescription: "avi Impact ist unser innovatives Programm zur kontinuierlichen Gesundheitsverbesserung. Mit Remote Monitoring werden Ihre Gesundheitsdaten regelmäßig erfasst und ausgewertet, um frühzeitig Veränderungen zu erkennen. Unsere Teleärzte und medizinischen Fachangestellten stehen Ihnen für alle Fragen zur Verfügung und bieten professionelle Begleitung. Die Therapieoptimierung beinhaltet personalisierte Lebensstilinterventionen und regelmäßige Kontrollen Ihrer Gesundheitsparameter.",
+      monthlyFee: "14,99€",
+      benefits: [
+        "Frühzeitige Erkennung gesundheitlicher Veränderungen",
+        "Persönlicher Gesundheitscoach",
+        "Individuell angepasste Therapiepläne",
+        "Digitale Dokumentation Ihrer Gesundheitsentwicklung"
       ]
     }
   ];
@@ -43,6 +58,9 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
               title={program.title}
               subtitle={program.subtitle}
               features={program.features}
+              detailsDescription={program.detailsDescription}
+              monthlyFee={program.monthlyFee}
+              benefits={program.benefits}
             />
           ))}
         </div>
