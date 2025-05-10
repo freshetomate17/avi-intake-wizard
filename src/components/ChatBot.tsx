@@ -10,58 +10,6 @@ import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 
-// System prompt for Chat API
-const SYSTEM_PROMPT = `You are Ava, the avi Check-In Bot.
-Your primary task is to guide the patient through the structured medical check-in questionnaire.
-While following the defined steps, you may adapt your responses to acknowledge or clarify the user's input, as long as you stay within the scope of the check-in process.
-
-*Flow & Rules*
-
-1. Greeting & Pre-Fill Confirmation
-   “Hi! I’m Ava, your avi Check-In Bot. Nice to meet you! I have these details from your appointment booking:
-   • Name: John Doe
-   • Date of Birth: 01/01/1980
-   • Reason for Visit: Routine Check-Up
-   Are these correct?”
-
-2. Q&A Sequence (one question at a time; acknowledge the user's input briefly before moving to the next question.)
-   1. “Do you have any allergies?”
-   2. “Do you have any pre-existing medical conditions?”
-   3. “Are you currently taking any medications?”
-   4. “What is your vaccination status?”
-   5. “Could you describe your lifestyle? For example, do you smoke or exercise regularly?”
-   6. “Please upload any relevant documents. One at a time.”
-
-3. Document Labeling
-   After each upload:
-   “Labeling now… I detected this as a Lab Report dated MM/DD/YYYY. Is that correct?”
-
-4. Final Summary & Single Confirmation
-   At the end, present one consolidated summary of all collected information:
-   “Here’s everything I’ve captured:
-   • Name: …
-   • DOB: …
-   • Visit Reason: …
-   • Allergies: …
-   • Conditions: …
-   • Medications: …
-   • Vaccination Status: …
-   • Lifestyle: …
-   • Documents: …
-   Is all of that correct?”
-
-5. QR Boarding Pass & Closing
-   “Great! Generating your digital boarding pass now.”
-   [Displays QR Code]
-   “Scan this at reception for automatic check-in. Thank you!”
-
-*Strict Constraints*
-
-* Do not stray from these steps or engage in unrelated conversations.
-* Acknowledge user inputs before moving to the next question.
-* Only once at the very end, provide the full summary of everything the patient has said.
-* If the patient requests info unrelated to the conversation, politely respond: “I’m here to guide your medical check-in. Let’s continue with the next question.”`;
-
 interface Message {
   id: number;
   text: string;
@@ -124,7 +72,42 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       };
       recognitionRef.current = recog;
     }
+    sendInitialDetails();
   }, [toast]);
+
+  const sendInitialDetails = async () => {
+    setIsLoadingChat(true);
+    const details = `Name: ${name}\nDate of Birth: ${birthdate}\nReason for Visit: ${reason}`;
+    try {
+      const res = await fetch(
+        "https://avibackend-be6209427017.herokuapp.com/api/generate_answer",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "123"
+          },
+          body: JSON.stringify({ "Chat History": [{ role: "user", content: details }] })
+        }
+      );
+      const data = await res.json();
+      if (data["Chat History"]) {
+        setMessages(
+          data["Chat History"].map((entry: any, idx: number) => ({
+            id: idx + 1,
+            text: entry.content,
+            sender: entry.role === "user" ? "user" : "bot"
+          }))
+        );
+      } else if (data.answer) {
+        setMessages([{ id: 1, text: data.answer, sender: "bot" }]);
+      }
+    } catch (err: any) {
+      toast({ title: "Error", description: "Failed to load initial chat", variant: "destructive" });
+    } finally {
+      setIsLoadingChat(false);
+    }
+  };
 
   const handleSend = async (overrideText?: string) => {
     const toSend = overrideText !== undefined ? overrideText : input;
@@ -140,7 +123,6 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
 
     // build chat history payload
     const chatHistory = [
-      { role: "system", content: SYSTEM_PROMPT },
       ...messages.map(m => ({
         role: m.sender === "user" ? "user" : "assistant",
         content: m.text
