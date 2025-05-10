@@ -1,27 +1,26 @@
 
 import React, { useState, useEffect } from "react";
 import { QRCodeCanvas } from 'qrcode.react';
-import { Check, Calendar, User, MapPin, Award, Wallet, Apple } from "lucide-react";
-import { Button } from "./ui/button";
+import { Check, Calendar, User, MapPin, Award } from "lucide-react";
 
 interface BoardingPassProps {
   onComplete: () => void;
   selectedPrograms?: string[];
-  patientName?: string;
-  birthdate?: string;             // ISO date string, e.g. "1980-01-23"
-  appointmentDate?: string;       // ISO date string for the appointment
-  appointmentTime?: string;       // time string, e.g. "10:30"
-  location?: string;              // full address or location name
+  patientName: string;
+  birthdate: string;             // ISO date string, e.g. "1980-01-23"
+  appointmentDate: string;       // ISO date string for the appointment
+  appointmentTime: string;       // time string, e.g. "10:30"
+  location: string;              // full address or location name
 }
 
 const BoardingPass: React.FC<BoardingPassProps> = ({
   onComplete,
   selectedPrograms = [],
-  patientName = "John Doe",
-  birthdate = "1980-01-23",
-  appointmentDate = "2025-05-12", 
-  appointmentTime = "10:30",
-  location = "Hausarztpraxis Avi Hauptbahnhof\nLuisenstraße 1\n80333 München",
+  patientName,
+  birthdate,
+  appointmentDate,
+  appointmentTime,
+  location,
 }) => {
   const [isGenerated, setIsGenerated] = useState(false);
 
@@ -43,17 +42,6 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
     }
   };
 
-  // Format appointment date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
   const qrData = {
     patientName,
     birthdate,
@@ -63,11 +51,6 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
     programs: selectedPrograms,
   };
   const qrValue = JSON.stringify(qrData);
-
-  const handleAddToWallet = () => {
-    // In a real implementation, this would generate and open a pkpass file
-    alert("In a production environment, this would add the boarding pass to Apple Wallet");
-  };
 
   return (
     <div className="flex flex-col h-full">
@@ -94,7 +77,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
                 <User className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
                   <p className="text-sm text-gray-500">Patient</p>
-                  <p className="font-medium">{patientName}</p>
+                  <p className="font-medium">John Doe</p>
                 </div>
               </div>
 
@@ -102,8 +85,8 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
                 <Calendar className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
                   <p className="text-sm text-gray-500">Appointment</p>
-                  <p className="font-medium">{formatDate(appointmentDate)}</p>
-                  <p className="font-medium">{appointmentTime} {Number(appointmentTime.split(':')[0]) >= 12 ? 'PM' : 'AM'}</p>
+                  <p className="font-medium">Monday, May 12, 2025</p>
+                  <p className="font-medium">10:30 AM</p>
                 </div>
               </div>
 
@@ -111,11 +94,9 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
                 <MapPin className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
-                  {location.split('\n').map((line, index) => (
-                    <p key={index} className={index === 0 ? "font-medium" : "text-sm"}>
-                      {line}
-                    </p>
-                  ))}
+                  <p className="font-medium">Hausarztpraxis Avi Hauptbahnhof</p>
+                  <p className="text-sm">Luisenstraße 1</p>
+                  <p className="text-sm">80333 München</p>
                 </div>
               </div>
 
@@ -147,20 +128,9 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
                 </div>
               </div>
 
-              <p className="text-center text-sm text-gray-500 mb-4">
+              <p className="text-center text-sm text-gray-500">
                 Code: AVIPAT-2505-1230
               </p>
-              
-              {/* Add to Apple Wallet button */}
-              <div className="flex justify-center">
-                <Button 
-                  onClick={handleAddToWallet} 
-                  className="bg-black text-white hover:bg-gray-800 mb-2"
-                >
-                  <Apple className="h-4 w-4 mr-2" />
-                  Add to Apple Wallet
-                </Button>
-              </div>
             </div>
           </div>
 

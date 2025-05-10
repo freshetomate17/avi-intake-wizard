@@ -16,11 +16,6 @@ enum FlowStep {
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<FlowStep>(FlowStep.START_CHECKIN);
   const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
-  
-  // Mock data for ChatBot component - added these for the required props
-  const [patientName, setPatientName] = useState<string>("John Doe");
-  const [patientBirthdate, setPatientBirthdate] = useState<string>("1980-01-01");
-  const [visitReason, setVisitReason] = useState<string>("Annual checkup");
 
   // Function to navigate to next step
   const goToNextStep = () => {
@@ -66,12 +61,7 @@ const Index = () => {
           <StartCheckIn onComplete={goToNextStep} />
         )}
         {currentStep === FlowStep.CHATBOT && (
-          <ChatBot 
-            onComplete={goToNextStep} 
-            name={patientName}
-            birthdate={patientBirthdate}
-            reason={visitReason}
-          />
+          <ChatBot onComplete={goToNextStep} />
         )}
         {currentStep === FlowStep.BONUS_PROGRAM && (
           <BonusProgramStep 

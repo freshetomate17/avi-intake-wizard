@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 // Allow using SpeechRecognition on window without TS errors
 declare global {
@@ -7,10 +6,9 @@ declare global {
     webkitSpeechRecognition: any;
   }
 }
-import { Camera, FileText, Mic, MicOff, FileImage, FileMinus, FilePlus, FileX, Bandage, Pill } from "lucide-react";
+import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
 import { stringify } from "querystring";
 
 interface Message {
@@ -42,12 +40,6 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   useEffect(() => {
     // set up SpeechRecognition on mount
@@ -73,7 +65,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
         toast({
           title: "Speech Recognition Error",
           description: err.error,
-          variant: "destructive", // Changed from "warning" to "destructive"
+          variant: "destructive",
         });
         setIsRecording(false);
       };
@@ -224,7 +216,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       toast({
         title: "Not supported",
         description: "Speech recognition is not supported in this browser.",
-        variant: "destructive", // Changed from "warning" to "destructive"
+        variant: "warning",
       });
       return;
     }
@@ -276,11 +268,11 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
     }, 2000);
   };
 
+
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digital Check-in</h2>
-      
-      {/* Voice and Photo info sections */}
+      {/* Voice info */}
       <div className="bg-primary/10 rounded-lg p-3 mb-4 flex items-center border border-primary/20">
         <Mic className="h-5 w-5 text-primary mr-2" />
         <p className="text-sm">
@@ -288,7 +280,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
           talk to Ava directly. Press the mic and speak.
         </p>
       </div>
-      
+      {/* Photo info */}
       <div className="bg-blue-50 rounded-lg p-3 mb-4 flex items-start border border-blue-200">
         <Camera className="h-5 w-5 text-blue-500 mr-2 mt-0.5" />
         <p className="text-sm">
@@ -296,9 +288,10 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
           documents, prescriptions or symptoms for better assistance.
         </p>
       </div>
-      
-      {/* Fixed Ava avatar container */}
-      <div className="flex justify-center mb-4">
+      {/* Ava avatar */}
+
+      {/* Ava animation */}
+      <div className="flex justify-center">
         <div className="w-64 h-64 rounded-full overflow-hidden relative">
           <video
             src="/videos/waiting.mp4"
@@ -323,69 +316,64 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
           />
         </div>
       </div>
-      
-      {/* Scrollable chat window */}
-      <ScrollArea className="flex-grow bg-gray-50 rounded-lg p-4 mb-4 h-[300px] max-h-[300px]">
-        <div className="flex flex-col">
-          {messages.map((m) => (
+      {/* Chat window */}
+      <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4">
+        {messages.map((m) => (
+          <div
+            key={m.id}
+            className={`mb-2 flex ${
+              m.sender === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             <div
-              key={m.id}
-              className={`mb-2 flex ${
-                m.sender === "user" ? "justify-end" : "justify-start"
+              className={`p-3 rounded-lg max-w-[80%] ${
+                m.sender === "user"
+                  ? "bg-primary text-white"
+                  : "bg-white border border-gray-300"
               }`}
             >
-              <div
-                className={`p-3 rounded-lg max-w-[80%] ${
-                  m.sender === "user"
-                    ? "bg-primary text-white"
-                    : "bg-white border border-gray-300"
-                }`}
-              >
-                {m.text}
-                {m.documentUrl && (
-                  <div className="mt-2 flex items-center">
-                    <FileText className="h-5 w-5 mr-2" />
-                    <a
-                      href={m.documentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm underline"
-                    >
-                      {m.documentName}
-                    </a>
-                  </div>
-                )}
-              </div>
+              {m.text}
+              {m.documentUrl && (
+                <div className="mt-2 flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  <a
+                    href={m.documentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm underline"
+                  >
+                    {m.documentName}
+                  </a>
+                </div>
+              )}
             </div>
-          ))}
-          {isAnalyzing && (
-            <div className="flex justify-start mb-2">
-              <div className="bg-white border border-gray-300 p-3 rounded-lg">
-                <div className="flex items-center">
-                  <span className="mr-2">Analyzing document</span>
-                  <div className="flex space-x-1">
-                    <div
-                      className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"
-                      style={{ animationDelay: "0ms" }}
-                    />
-                    <div
-                      className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"
-                      style={{ animationDelay: "200ms" }}
-                    />
-                    <div
-                      className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"
-                      style={{ animationDelay: "400ms" }}
-                    />
-                  </div>
+          </div>
+        ))}
+        {isAnalyzing && (
+          <div className="flex justify-start mb-2">
+            <div className="bg-white border border-gray-300 p-3 rounded-lg">
+              <div className="flex items-center">
+                <span className="mr-2">Analyzing document</span>
+                <div className="flex space-x-1">
+                  <div
+                    className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"
+                    style={{ animationDelay: "0ms" }}
+                  />
+                  <div
+                    className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"
+                    style={{ animationDelay: "200ms" }}
+                  />
+                  <div
+                    className="h-2 w-2 bg-gray-500 rounded-full animate-bounce"
+                    style={{ animationDelay: "400ms" }}
+                  />
                 </div>
               </div>
             </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </ScrollArea>
-      
-      {/* Input area - fixed at bottom */}
+          </div>
+        )}
+      </div>
+      {/* Input area */}
       <div className="flex items-center mb-4">
         <input
           type="file"
@@ -443,6 +431,10 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
             <polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
         </button>
+      </div>
+
+      {/* Next button (previously Continue button) */}
+      <div className="flex justify-end">
       </div>
     </div>
   );
