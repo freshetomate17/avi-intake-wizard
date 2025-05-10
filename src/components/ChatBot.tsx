@@ -19,7 +19,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Willkommen zum digitalen Check-in! Ich bin Ava, Ihre digitale Assistentin. Ich werde Ihnen beim Check-in-Prozess helfen.",
+      text: "Willkommen zum digitalen Check-in! Ich bin Ava, Ihre digitale Assistentin. Ich werde Ihnen beim Check-in-Prozess helfen. 😊",
       sender: "bot",
     },
     {
