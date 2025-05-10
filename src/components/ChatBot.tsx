@@ -7,7 +7,7 @@ declare global {
     webkitSpeechRecognition: any;
   }
 }
-import { Camera, FileText, Mic, MicOff, FileImage, FileMinus, FilePlus, FileX, Bandage, Pill, FileMedical } from "lucide-react";
+import { Camera, FileText, Mic, MicOff, FileImage, FileMinus, FilePlus, FileX, Bandage, Pill } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 
@@ -232,7 +232,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
       toast({
         title: "Not supported",
         description: "Speech recognition is not supported in this browser.",
-        variant: "warning",
+        variant: "destructive",
       });
       return;
     }
@@ -325,6 +325,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         description: matchedDoc 
           ? `Document recognized as ${matchedDoc.name}`
           : "Document uploaded successfully",
+        variant: "default",
       });
     }, 2000);
   };
@@ -333,9 +334,9 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     switch(docType) {
       case "insurance": return <FilePlus className="h-4 w-4" />;
       case "referral": return <FileText className="h-4 w-4" />;
-      case "lab": return <FileMedical className="h-4 w-4" />;
+      case "lab": return <FileText className="h-4 w-4" />;
       case "imaging": return <FileImage className="h-4 w-4" />;
-      case "vaccination": return <FileMedical className="h-4 w-4" />;
+      case "vaccination": return <FileText className="h-4 w-4" />;
       case "medication": return <Pill className="h-4 w-4" />;
       case "symptoms": return <Bandage className="h-4 w-4" />;
       default: return <FileText className="h-4 w-4" />;
