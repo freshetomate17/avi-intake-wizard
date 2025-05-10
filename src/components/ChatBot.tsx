@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 // Allow using SpeechRecognition on window without TS errors
 declare global {
@@ -223,7 +224,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       toast({
         title: "Not supported",
         description: "Speech recognition is not supported in this browser.",
-        variant: "warning",
+        variant: "destructive", // Changed from "warning" to "destructive"
       });
       return;
     }
