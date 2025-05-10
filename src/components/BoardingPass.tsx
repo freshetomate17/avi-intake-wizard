@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from "react";
-import { Check, Calendar, User, MapPin } from "lucide-react";
+import { Check, Calendar, User, MapPin, Award } from "lucide-react";
 
 interface BoardingPassProps {
   onComplete: () => void;
+  selectedPrograms?: string[];
 }
 
-const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
+const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedPrograms = [] }) => {
   const [isGenerated, setIsGenerated] = useState(false);
 
   // Simulate loading time for boarding pass generation
@@ -17,6 +18,15 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Function to format program names for display
+  const formatProgramName = (id: string): string => {
+    switch (id) {
+      case "hausarzt-plus": return "avi Primary Care Plus";
+      case "impact": return "avi Impact";
+      default: return id;
+    }
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -65,6 +75,19 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
                   <p className="text-sm">123 Main Street, 10115 Berlin</p>
                 </div>
               </div>
+
+              {/* Bonus Programs */}
+              {selectedPrograms && selectedPrograms.length > 0 && (
+                <div className="flex items-center mb-6">
+                  <Award className="h-5 w-5 text-gray-500 mr-2" />
+                  <div>
+                    <p className="text-sm text-gray-500">Bonus Programs</p>
+                    {selectedPrograms.map((program, index) => (
+                      <p key={program} className="font-medium">{formatProgramName(program)}</p>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* QR Code */}
               <div className="flex justify-center mb-4">

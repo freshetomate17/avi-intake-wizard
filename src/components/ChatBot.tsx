@@ -1,7 +1,8 @@
 
 import React, { useState, useRef } from "react";
-import { Camera, FileText } from "lucide-react";
+import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "./ui/button";
 
 interface Message {
   id: number;
@@ -162,6 +163,22 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digital Check-in</h2>
       
+      {/* Voice interaction notification */}
+      <div className="bg-primary/10 rounded-lg p-3 mb-4 flex items-center border border-primary/20">
+        <Mic className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+        <p className="text-sm">
+          <span className="font-medium">Voice-enabled assistant:</span> You can communicate with Ava primarily through voice. This chat is for reviewing the conversation.
+        </p>
+      </div>
+      
+      {/* Photo capabilities information */}
+      <div className="bg-blue-50 rounded-lg p-3 mb-4 flex items-start border border-blue-200">
+        <Camera className="h-5 w-5 text-blue-500 mr-2 mt-0.5 flex-shrink-0" />
+        <p className="text-sm">
+          <span className="font-medium">Photo upload available:</span> You can take photos of medical documents, prescriptions, medical devices (blood pressure/glucose monitors), medication packages, or physical symptoms for better assistance.
+        </p>
+      </div>
+      
       {/* Ava animation - centered and large, border removed */}
       <div className="flex justify-center mb-6">
         <div className="w-64 h-64 rounded-full overflow-hidden">
@@ -243,7 +260,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         />
         <button
           onClick={triggerFileUpload}
-          className="p-2 rounded-full mr-2 bg-gray-200 hover:bg-gray-300"
+          className="p-2 rounded-full mr-2 bg-gray-200 hover:bg-gray-300 flex items-center justify-center"
+          title="Upload document or photo"
         >
           <Camera size={24} />
         </button>
@@ -251,18 +269,13 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           onClick={isRecording ? () => setIsRecording(false) : startRecording}
           className={`p-2 rounded-full mr-2 ${
             isRecording ? "bg-red-500 text-white" : "bg-gray-200 hover:bg-gray-300"
-          }`}
+          } flex items-center justify-center`}
+          title={isRecording ? "Stop recording" : "Start voice input"}
         >
           {isRecording ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="6" y="6" width="12" height="12" />
-            </svg>
+            <MicOff size={24} />
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-              <line x1="12" x2="12" y1="19" y2="22" />
-            </svg>
+            <Mic size={24} />
           )}
         </button>
         <input
@@ -278,7 +291,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           disabled={!input.trim()}
           className={`ml-2 p-2 rounded-full ${
             input.trim() ? "bg-primary text-white" : "bg-gray-200"
-          }`}
+          } flex items-center justify-center`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="22" x2="11" y1="2" y2="13" />

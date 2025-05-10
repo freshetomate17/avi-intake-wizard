@@ -17,6 +17,7 @@ enum FlowStep {
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState<FlowStep>(FlowStep.START_CHECKIN);
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
 
   // Function to navigate to next step
   const goToNextStep = () => {
@@ -31,6 +32,11 @@ const Index = () => {
   // Function to navigate to a specific step
   const goToStep = (step: FlowStep) => {
     setCurrentStep(step);
+  };
+
+  // Function to handle selected programs
+  const handleProgramsSelected = (programs: string[]) => {
+    setSelectedPrograms(programs);
   };
 
   return (
@@ -63,10 +69,16 @@ const Index = () => {
           <ChatBot onComplete={goToNextStep} />
         )}
         {currentStep === FlowStep.BONUS_PROGRAM && (
-          <BonusProgramStep onComplete={goToNextStep} />
+          <BonusProgramStep 
+            onComplete={goToNextStep}
+            onProgramsSelected={handleProgramsSelected}
+          />
         )}
         {currentStep === FlowStep.BOARDING_PASS && (
-          <BoardingPass onComplete={goToNextStep} />
+          <BoardingPass 
+            onComplete={goToNextStep} 
+            selectedPrograms={selectedPrograms}
+          />
         )}
         {currentStep === FlowStep.DOCTOR_DASHBOARD && (
           <DoctorDashboard />

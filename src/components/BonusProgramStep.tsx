@@ -1,12 +1,15 @@
 
-import React from "react";
+import React, { useState } from "react";
 import ProgramCard, { ProgramProps } from "./ProgramCard";
 
 interface BonusProgramStepProps {
   onComplete: () => void;
+  onProgramsSelected?: (selectedPrograms: string[]) => void;
 }
 
-const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
+const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete, onProgramsSelected }) => {
+  const [selectedPrograms, setSelectedPrograms] = useState<string[]>([]);
+
   const programs: ProgramProps[] = [
     {
       id: "hausarzt-plus",
@@ -45,6 +48,23 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
     }
   ];
 
+  const handleProgramToggle = (programId: string) => {
+    setSelectedPrograms(prev => {
+      if (prev.includes(programId)) {
+        return prev.filter(id => id !== programId);
+      } else {
+        return [...prev, programId];
+      }
+    });
+  };
+
+  const handleComplete = () => {
+    if (onProgramsSelected) {
+      onProgramsSelected(selectedPrograms);
+    }
+    onComplete();
+  };
+
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Bonus Programs</h2>
@@ -52,26 +72,38 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete }) => {
       <div className="flex-grow">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {programs.map((program) => (
-            <ProgramCard 
-              key={program.id}
-              id={program.id}
-              title={program.title}
-              subtitle={program.subtitle}
-              features={program.features}
-              detailsDescription={program.detailsDescription}
-              monthlyFee={program.monthlyFee}
-              benefits={program.benefits}
-            />
+            <div 
+              key={program.id} 
+              className={`relative ${selectedPrograms.includes(program.id) ? 'ring-2 ring-primary' : ''}`}
+              onClick={() => handleProgramToggle(program.id)}
+            >
+              <ProgramCard 
+                id={program.id}
+                title={program.title}
+                subtitle={program.subtitle}
+                features={program.features}
+                detailsDescription={program.detailsDescription}
+                monthlyFee={program.monthlyFee}
+                benefits={program.benefits}
+              />
+              {selectedPrograms.includes(program.id) && (
+                <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>
       
       <div className="flex justify-end mt-4">
         <button
-          onClick={onComplete}
+          onClick={handleComplete}
           className="px-4 py-2 bg-primary text-white rounded-xl"
         >
-          Next
+          Continue
         </button>
       </div>
     </div>
