@@ -4,6 +4,7 @@ import ChatBot from "@/components/ChatBot";
 import BoardingPass from "@/components/BoardingPass";
 import BonusProgramStep from "@/components/BonusProgramStep";
 import StartCheckIn from "@/components/StartCheckIn";
+import AviLogo from "@/components/AviLogo";
 
 // Main flow steps
 enum FlowStep {
@@ -40,9 +41,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center">
       <div className="w-full max-w-3xl p-4">
-        {/* Logo in the top right */}
+        {/* Logo in the top right - replaced with AviLogo component */}
         <div className="absolute top-10 right-8">
-          <img src="/avi-logo.png" alt="avi logo" className="h-16" />
+          <AviLogo className="h-16" />
         </div>
         
         {/* Progress indicator */}
