@@ -1,21 +1,13 @@
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Camera, Upload, FileText, Loader } from "lucide-react";
+import React, { useState } from "react";
+import { Upload, FileText, Check } from "lucide-react";
 
 interface UploadDocsProps {
   onComplete: () => void;
 }
 
-interface UploadedFile {
-  id: string;
-  name: string;
-  progress: number;
-  status: "uploading" | "processing" | "complete" | "error";
-}
-
-const UploadDocs = ({ onComplete }: UploadDocsProps) => {
-  const [files, setFiles] = useState<UploadedFile[]>([]);
+const UploadDocs: React.FC<UploadDocsProps> = ({ onComplete }) => {
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -30,184 +22,104 @@ const UploadDocs = ({ onComplete }: UploadDocsProps) => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
-    
-    if (e.dataTransfer.files) {
-      handleFiles(e.dataTransfer.files);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(Array.from(e.dataTransfer.files));
     }
   };
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      handleFiles(e.target.files);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      handleFiles(Array.from(e.target.files));
     }
   };
 
-  const handleFiles = (fileList: FileList) => {
-    // Convert FileList to array and process
-    const newFiles = Array.from(fileList).map(file => ({
-      id: Math.random().toString(36).substring(7),
-      name: file.name,
-      progress: 0,
-      status: "uploading" as const
-    }));
-    
-    setFiles(prev => [...prev, ...newFiles]);
-    
-    // Simulate upload and OCR process
-    newFiles.forEach(file => {
-      simulateUploadProgress(file.id);
-    });
+  const handleFiles = (files: File[]) => {
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+    const validFiles = files.filter(file => allowedTypes.includes(file.type));
+    setUploadedFiles(prev => [...prev, ...validFiles]);
   };
 
-  const simulateUploadProgress = (fileId: string) => {
-    let progress = 0;
-    
-    const interval = setInterval(() => {
-      progress += 10;
-      
-      if (progress <= 100) {
-        setFiles(prev => 
-          prev.map(file => 
-            file.id === fileId 
-              ? { 
-                  ...file, 
-                  progress, 
-                  status: progress < 100 ? "uploading" : "processing" 
-                }
-              : file
-          )
-        );
-      } else {
-        clearInterval(interval);
-        
-        // After upload, simulate OCR processing
-        setTimeout(() => {
-          setFiles(prev => 
-            prev.map(file => 
-              file.id === fileId 
-                ? { ...file, status: "complete" }
-                : file
-            )
-          );
-        }, 1500);
-      }
-    }, 300);
-  };
-
-  const handleCameraCapture = () => {
-    // In a real app, this would open the camera
-    console.log("Camera capture requested");
-    
-    // Simulate a captured document
-    const capturedFile = {
-      id: Math.random().toString(36).substring(7),
-      name: "Camera_Capture_" + new Date().toISOString().slice(0, 10) + ".jpg",
-      progress: 0,
-      status: "uploading" as const
-    };
-    
-    setFiles(prev => [...prev, capturedFile]);
-    simulateUploadProgress(capturedFile.id);
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   return (
-    <div>
-      <h2 className="text-2xl font-serif mb-4">Document Upload</h2>
+    <div className="flex flex-col h-full">
+      <h2 className="text-2xl font-serif font-bold mb-4">
+        Bitte laden Sie Ihre Dokumente hoch
+      </h2>
       
-      <p className="mb-6 text-gray-600">
-        Please upload your insurance card, ID, and any relevant medical documents.
+      <p className="mb-6 text-gray-700">
+        Um Ihre Anmeldung zu vervollständigen, laden Sie bitte Ihre Versicherungskarte und ärztlichen Überweisungen hoch.
       </p>
-      
-      {/* Upload zone */}
-      <div 
-        className={`border-2 border-dashed rounded-lg p-8 mb-6 flex flex-col items-center justify-center cursor-pointer transition-all ${
-          isDragging ? "border-primary bg-primary/5" : "border-primary/30"
+
+      {/* Upload area */}
+      <div
+        className={`border-2 border-dashed rounded-lg p-8 mb-6 flex flex-col items-center justify-center cursor-pointer ${
+          isDragging ? "border-primary bg-primary/5" : "border-gray-300"
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={() => document.getElementById("file-input")?.click()}
+        onClick={() => document.getElementById("fileInput")?.click()}
       >
-        <input 
-          type="file" 
-          id="file-input" 
-          multiple 
-          className="hidden" 
-          onChange={handleFileInput}
-          accept="image/*,.pdf"
+        <Upload className="h-12 w-12 text-gray-400 mb-4" />
+        <p className="text-lg font-medium mb-1">
+          Dateien hierher ziehen oder klicken zum Auswählen
+        </p>
+        <p className="text-sm text-gray-500">
+          Unterstützt werden PDF, JPG und PNG (max. 10MB)
+        </p>
+        <input
+          id="fileInput"
+          type="file"
+          className="hidden"
+          accept=".pdf,.jpg,.jpeg,.png"
+          onChange={handleFileChange}
+          multiple
         />
-        
-        <Upload size={40} className="text-primary mb-4" />
-        <p className="text-center mb-2">Drag and drop files here or click to browse</p>
-        <p className="text-sm text-gray-500">Supports images and PDF documents</p>
-        
-        <div className="mt-4 flex items-center">
-          <Button 
-            variant="outline" 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCameraCapture();
-            }}
-            className="flex items-center gap-2"
-          >
-            <Camera size={16} />
-            Capture with camera
-          </Button>
-        </div>
       </div>
-      
+
       {/* Uploaded files list */}
-      {files.length > 0 && (
-        <div className="mb-6">
-          <h3 className="font-medium mb-3">Uploaded Files</h3>
-          <div className="space-y-3">
-            {files.map(file => (
-              <div key={file.id} className="border rounded-md p-3 flex items-center">
-                <FileText className="text-primary mr-3" />
-                <div className="flex-grow">
-                  <p className="font-medium">{file.name}</p>
-                  
-                  {file.status === "uploading" && (
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                      <div 
-                        className="bg-primary h-1.5 rounded-full" 
-                        style={{ width: `${file.progress}%` }}
-                      ></div>
-                    </div>
-                  )}
-                  
-                  {file.status === "processing" && (
-                    <div className="flex items-center text-sm text-gray-500 mt-1">
-                      <Loader size={12} className="animate-spin mr-1" />
-                      OCR Processing...
-                    </div>
-                  )}
-                  
-                  {file.status === "complete" && (
-                    <p className="text-sm text-green-600 mt-1">
-                      Processed successfully
-                    </p>
-                  )}
-                  
-                  {file.status === "error" && (
-                    <p className="text-sm text-red-600 mt-1">
-                      Error processing file
-                    </p>
-                  )}
-                </div>
+      {uploadedFiles.length > 0 && (
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <h3 className="font-medium mb-2">Hochgeladene Dateien</h3>
+          {uploadedFiles.map((file, index) => (
+            <div
+              key={`${file.name}-${index}`}
+              className="flex items-center justify-between py-2 border-b last:border-0"
+            >
+              <div className="flex items-center">
+                <FileText className="h-5 w-5 mr-2 text-gray-500" />
+                <span className="text-sm">{file.name}</span>
               </div>
-            ))}
-          </div>
+              <div className="flex items-center">
+                <Check className="h-5 w-5 text-green-500 mr-2" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeFile(index);
+                  }}
+                  className="text-red-500 text-sm hover:text-red-700"
+                >
+                  Entfernen
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
-      
-      <Button 
-        onClick={onComplete}
-        disabled={!files.some(file => file.status === "complete")}
-        className="bg-primary text-white rounded-xl"
-      >
-        Continue
-      </Button>
+
+      <div className="flex justify-end mt-auto">
+        <button
+          onClick={onComplete}
+          className="px-4 py-2 bg-primary text-white rounded-xl"
+          disabled={uploadedFiles.length === 0}
+        >
+          Weiter
+        </button>
+      </div>
     </div>
   );
 };

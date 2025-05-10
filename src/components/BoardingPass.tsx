@@ -1,107 +1,146 @@
 
-import { Button } from "@/components/ui/button";
-import { QrCode, Calendar, Clock, MapPin } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Check, Calendar, User, MapPin } from "lucide-react";
 
 interface BoardingPassProps {
   onComplete: () => void;
 }
 
-const BoardingPass = ({ onComplete }: BoardingPassProps) => {
-  // Placeholder data for the boarding pass
-  const appointment = {
-    patient: "Jane Doe",
-    doctor: "Dr. Maria Schmidt",
-    date: "May 15, 2025",
-    time: "10:30 AM",
-    location: "avi Medical Center",
-    address: "Leopoldstraße 23, 80802 München",
-    appointmentId: "AVP-2305150023"
-  };
+const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete }) => {
+  const [isGenerated, setIsGenerated] = useState(false);
+
+  // Simulate loading time for boarding pass generation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsGenerated(true);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="flex flex-col items-center">
-      <h2 className="text-2xl font-serif mb-4">Your Digital Boarding Pass</h2>
-      
-      <p className="mb-6 text-gray-600">
-        Your check-in is complete! Here is your digital boarding pass.
-        Please scan the QR code upon arrival.
-      </p>
-      
-      {/* Boarding Pass Card */}
-      <div className="w-full max-w-md bg-white border rounded-xl overflow-hidden shadow-lg mb-8">
-        {/* Header */}
-        <div className="bg-primary text-white p-4">
-          <div className="text-sm">Digital Boarding Pass</div>
-          <div className="text-xl font-semibold">{appointment.patient}</div>
+    <div className="flex flex-col h-full">
+      <h2 className="text-2xl font-serif font-bold mb-4">Ihr digitaler Termin-Pass</h2>
+
+      {!isGenerated ? (
+        <div className="flex flex-col items-center justify-center flex-grow">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+          <p className="text-gray-700">Ihr Termin-Pass wird generiert...</p>
         </div>
-        
-        {/* QR Code Section */}
-        <div className="flex justify-center p-6 bg-[#E6FFF4]">
-          {/* Placeholder QR code - in a real app this would be generated */}
-          <div className="w-40 h-40 bg-white p-2 rounded-lg flex items-center justify-center">
-            <QrCode size={120} className="text-primary" />
-          </div>
-        </div>
-        
-        {/* Appointment Details */}
-        <div className="p-4">
-          <div className="mb-4">
-            <div className="text-sm text-gray-500 uppercase">Appointment with</div>
-            <div className="text-lg font-medium">{appointment.doctor}</div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-start">
-              <Calendar className="w-4 h-4 text-primary mt-1 mr-2" />
-              <div>
-                <div className="text-xs text-gray-500">Date</div>
-                <div>{appointment.date}</div>
+      ) : (
+        <div className="flex-grow flex flex-col">
+          {/* Digital Boarding Pass */}
+          <div className="bg-white rounded-lg border shadow-lg overflow-hidden mb-6">
+            {/* Header with Logo */}
+            <div className="bg-primary text-white p-4 flex justify-between items-center">
+              <h3 className="text-xl font-bold">Termin bestätigt</h3>
+              <img src="/avi-logo.png" alt="avi logo" className="h-8" />
+            </div>
+
+            {/* Pass Content */}
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <User className="h-5 w-5 text-gray-500 mr-2" />
+                <div>
+                  <p className="text-sm text-gray-500">Patient</p>
+                  <p className="font-medium">Max Mustermann</p>
+                </div>
               </div>
-            </div>
-            
-            <div className="flex items-start">
-              <Clock className="w-4 h-4 text-primary mt-1 mr-2" />
-              <div>
-                <div className="text-xs text-gray-500">Time</div>
-                <div>{appointment.time}</div>
+
+              <div className="flex items-center mb-4">
+                <Calendar className="h-5 w-5 text-gray-500 mr-2" />
+                <div>
+                  <p className="text-sm text-gray-500">Termin</p>
+                  <p className="font-medium">Montag, 12. Mai 2025</p>
+                  <p className="font-medium">10:30 Uhr</p>
+                </div>
               </div>
+
+              <div className="flex items-center mb-6">
+                <MapPin className="h-5 w-5 text-gray-500 mr-2" />
+                <div>
+                  <p className="text-sm text-gray-500">Ort</p>
+                  <p className="font-medium">Dr. med. Julia Schmidt</p>
+                  <p className="text-sm">Praxis für Allgemeinmedizin</p>
+                  <p className="text-sm">Hauptstraße 123, 10115 Berlin</p>
+                </div>
+              </div>
+
+              {/* QR Code */}
+              <div className="flex justify-center mb-4">
+                <div className="bg-gray-100 w-40 h-40 rounded-lg flex items-center justify-center">
+                  <svg viewBox="0 0 100 100" className="w-36 h-36">
+                    {/* Simplified QR code for illustration */}
+                    <rect x="5" y="5" width="90" height="90" fill="white" />
+                    <rect x="15" y="15" width="10" height="10" />
+                    <rect x="35" y="15" width="10" height="10" />
+                    <rect x="55" y="15" width="10" height="10" />
+                    <rect x="75" y="15" width="10" height="10" />
+                    
+                    <rect x="15" y="35" width="10" height="10" />
+                    <rect x="45" y="35" width="10" height="10" />
+                    <rect x="65" y="35" width="10" height="10" />
+                    
+                    <rect x="25" y="45" width="10" height="10" />
+                    <rect x="55" y="45" width="10" height="10" />
+                    <rect x="75" y="45" width="10" height="10" />
+                    
+                    <rect x="15" y="55" width="10" height="10" />
+                    <rect x="35" y="55" width="10" height="10" />
+                    <rect x="65" y="55" width="10" height="10" />
+                    
+                    <rect x="15" y="75" width="10" height="10" />
+                    <rect x="35" y="75" width="10" height="10" />
+                    <rect x="55" y="75" width="10" height="10" />
+                    <rect x="75" y="75" width="10" height="10" />
+                  </svg>
+                </div>
+              </div>
+
+              <p className="text-center text-sm text-gray-500">
+                Code: AVIPAT-2505-1230
+              </p>
             </div>
           </div>
-          
-          <div className="mt-4 flex items-start">
-            <MapPin className="w-4 h-4 text-primary mt-1 mr-2" />
-            <div>
-              <div className="text-xs text-gray-500">Location</div>
-              <div>{appointment.location}</div>
-              <div className="text-sm text-gray-600">{appointment.address}</div>
-            </div>
-          </div>
-          
-          <div className="mt-4 pt-4 border-t text-center text-xs text-gray-500">
-            Appointment ID: {appointment.appointmentId}
+
+          {/* Instructions */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <h4 className="font-medium mb-2">Hinweise:</h4>
+            <ul className="space-y-2">
+              <li className="flex items-start">
+                <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-700">
+                  Bitte zeigen Sie diesen Pass bei Ihrer Ankunft vor
+                </span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-700">
+                  Erscheinen Sie bitte 10 Minuten vor Ihrem Termin
+                </span>
+              </li>
+              <li className="flex items-start">
+                <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-700">
+                  Bringen Sie Ihre Versicherungskarte und andere relevante Dokumente mit
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
-      
-      <div className="text-center mb-6">
-        <p className="text-sm text-gray-600 mb-2">
-          We've also sent this boarding pass to your email.
-        </p>
-        <Button
-          variant="outline"
-          className="flex items-center gap-2"
+      )}
+
+      <div className="flex justify-end mt-auto">
+        <button
+          onClick={onComplete}
+          className={`px-4 py-2 bg-primary text-white rounded-xl ${
+            !isGenerated ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!isGenerated}
         >
-          <Calendar size={16} />
-          Add to calendar
-        </Button>
+          Weiter
+        </button>
       </div>
-      
-      <Button 
-        onClick={onComplete}
-        className="bg-primary text-white rounded-xl w-full max-w-sm"
-      >
-        Scan at arrival
-      </Button>
     </div>
   );
 };

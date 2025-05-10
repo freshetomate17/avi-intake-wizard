@@ -1,125 +1,202 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, AlertCircle, Activity, FileText, Shield } from "lucide-react";
+import React, { useState } from "react";
+import { Calendar, Clock, User, FileText } from "lucide-react";
 
-const DoctorDashboard = () => {
+const DoctorDashboard: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<"upcoming" | "history">("upcoming");
+
+  // Sample appointment data
+  const upcomingAppointments = [
+    {
+      id: 1,
+      patient: "Max Mustermann",
+      date: "12. Mai 2025",
+      time: "10:30",
+      type: "Routineuntersuchung",
+      status: "confirmed",
+    },
+    {
+      id: 2,
+      patient: "Anna Schmidt",
+      date: "12. Mai 2025",
+      time: "11:45",
+      type: "Erstberatung",
+      status: "confirmed",
+    },
+    {
+      id: 3,
+      patient: "Thomas Weber",
+      date: "12. Mai 2025",
+      time: "13:15",
+      type: "Nachsorge",
+      status: "pending",
+    },
+  ];
+
+  const historyAppointments = [
+    {
+      id: 101,
+      patient: "Max Mustermann",
+      date: "15. April 2025",
+      time: "09:15",
+      type: "Blutuntersuchung",
+      status: "completed",
+    },
+    {
+      id: 102,
+      patient: "Erika Meyer",
+      date: "28. April 2025",
+      time: "14:30",
+      type: "Impfung",
+      status: "completed",
+    },
+  ];
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "confirmed":
+        return (
+          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+            Bestätigt
+          </span>
+        );
+      case "pending":
+        return (
+          <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+            Ausstehend
+          </span>
+        );
+      case "completed":
+        return (
+          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+            Abgeschlossen
+          </span>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div>
-      <h2 className="text-2xl font-serif mb-6">Doctor Dashboard Preview</h2>
-      
-      <p className="mb-6 text-gray-600">
-        Here's a preview of what your doctor will see when you arrive.
-        Your digital check-in information has been processed and organized for your healthcare provider.
-      </p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Insurance & Eligibility Card */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center">
-              <Shield className="mr-2 text-primary" size={20} />
-              Insurance & Eligibility
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span>Insurance Status</span>
-                <span className="flex items-center text-green-600">
-                  <Check size={16} className="mr-1" /> Verified
-                </span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span>Coverage</span>
-                <span>Full coverage (90%)</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span>Co-pay Amount</span>
-                <span>€10.00</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span>Last Verification</span>
-                <span>Today</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Vitals & Lab Trends Card */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center">
-              <Activity className="mr-2 text-primary" size={20} />
-              Vitals & Lab Trends
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent>
-            {/* Placeholder for chart - in a real app, this would use Recharts */}
-            <div className="bg-gray-50 rounded-md p-4 h-40 flex items-center justify-center mb-3">
-              <div className="w-full h-full relative">
-                {/* Simple line visualization placeholder */}
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gray-300"></div>
-                <div className="absolute left-0 bottom-0 h-full w-px bg-gray-300"></div>
-                
-                <div className="absolute bottom-10 left-4 w-4 h-4 bg-primary rounded-full"></div>
-                <div className="absolute bottom-16 left-16 w-4 h-4 bg-primary rounded-full"></div>
-                <div className="absolute bottom-12 left-28 w-4 h-4 bg-primary rounded-full"></div>
-                <div className="absolute bottom-20 left-40 w-4 h-4 bg-primary rounded-full"></div>
-                <div className="absolute bottom-14 left-52 w-4 h-4 bg-primary rounded-full"></div>
-                
-                <div className="absolute bottom-10 left-4 w-48 h-px bg-primary"></div>
-                <div className="absolute bottom-16 left-16 w-24 h-px bg-primary"></div>
-                <div className="absolute bottom-12 left-28 w-12 h-px bg-primary"></div>
-                <div className="absolute bottom-20 left-40 w-12 h-px bg-primary"></div>
-              </div>
-            </div>
-            
-            <div className="text-xs text-gray-500 text-center">
-              Blood Pressure Trends (Last 6 Months)
-            </div>
-          </CardContent>
-        </Card>
-        
-        {/* Pending Tasks Card */}
-        <Card className="md:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center">
-              <FileText className="mr-2 text-primary" size={20} />
-              Pending Tasks
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center p-2 bg-amber-50 rounded-md">
-                <AlertCircle size={16} className="text-amber-500 mr-2" />
-                <span>Flu vaccination due</span>
-              </div>
-              
-              <div className="flex items-center p-2 bg-amber-50 rounded-md">
-                <AlertCircle size={16} className="text-amber-500 mr-2" />
-                <span>Blood test results to review from 04/28/2025</span>
-              </div>
-              
-              <div className="flex items-center p-2 bg-red-50 rounded-md">
-                <AlertCircle size={16} className="text-red-500 mr-2" />
-                <span>Missing allergy information</span>
-              </div>
-              
-              <div className="flex items-center p-2 bg-gray-50 rounded-md">
-                <Check size={16} className="text-gray-400 mr-2" />
-                <span className="line-through text-gray-500">
-                  Insurance card verification
-                </span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-serif font-bold">Arzt Dashboard</h2>
+        <div className="flex items-center space-x-2">
+          <User className="h-5 w-5 text-gray-700" />
+          <span className="font-medium">Dr. Julia Schmidt</span>
+        </div>
+      </div>
+
+      {/* Dashboard Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white p-4 rounded-lg shadow flex items-center">
+          <div className="rounded-full bg-blue-100 p-3 mr-4">
+            <Calendar className="h-6 w-6 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Termine heute</p>
+            <p className="text-2xl font-bold">8</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow flex items-center">
+          <div className="rounded-full bg-green-100 p-3 mr-4">
+            <Clock className="h-6 w-6 text-green-600" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Nächster Termin</p>
+            <p className="text-lg font-bold">10:30 Uhr</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow flex items-center">
+          <div className="rounded-full bg-purple-100 p-3 mr-4">
+            <FileText className="h-6 w-6 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-sm text-gray-500">Neue Dokumente</p>
+            <p className="text-2xl font-bold">3</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Appointments Tab Navigation */}
+      <div className="border-b mb-4">
+        <div className="flex space-x-8">
+          <button
+            className={`pb-2 px-1 ${
+              activeTab === "upcoming"
+                ? "border-b-2 border-primary text-primary font-medium"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("upcoming")}
+          >
+            Anstehende Termine
+          </button>
+          <button
+            className={`pb-2 px-1 ${
+              activeTab === "history"
+                ? "border-b-2 border-primary text-primary font-medium"
+                : "text-gray-500"
+            }`}
+            onClick={() => setActiveTab("history")}
+          >
+            Terminhistorie
+          </button>
+        </div>
+      </div>
+
+      {/* Appointment List */}
+      <div className="bg-white rounded-lg overflow-hidden flex-grow">
+        <table className="min-w-full">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Patient
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Datum & Zeit
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Typ
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Aktionen
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {(activeTab === "upcoming" ? upcomingAppointments : historyAppointments).map(
+              (appointment) => (
+                <tr key={appointment.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="font-medium text-gray-900">
+                      {appointment.patient}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-gray-900">{appointment.date}</div>
+                    <div className="text-gray-500">{appointment.time}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                    {appointment.type}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getStatusBadge(appointment.status)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button className="text-primary hover:text-primary-dark">
+                      Details
+                    </button>
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
