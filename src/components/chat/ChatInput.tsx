@@ -23,14 +23,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleMicClick = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   return (
     <div className="flex items-center mb-4">
       <input
         type="file"
         ref={fileInputRef}
-        onChange={(e) => {
-          if (e.target.files && e.target.files.length > 0) {
-            const file = e.target.files[0];
+        onChange={() => {
+          if (fileInputRef.current?.files && fileInputRef.current.files.length > 0) {
             triggerFileUpload();
           }
         }}
@@ -45,7 +52,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <Camera size={24} />
       </button>
       <button
-        onClick={isRecording ? stopRecording : startRecording}
+        onClick={handleMicClick}
         className={`p-2 rounded-full mr-2 ${
           isRecording ? "bg-red-500 text-white" : "bg-gray-200 hover:bg-gray-300"
         } flex items-center justify-center`}

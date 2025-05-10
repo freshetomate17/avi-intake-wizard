@@ -27,6 +27,18 @@ export const useSpeechToText = () => {
     }
   }, [browserSupportsSpeechRecognition, toast]);
 
+  // Check for microphone access when starting to record
+  useEffect(() => {
+    if (isRecording && !isMicrophoneAvailable) {
+      stopRecording();
+      toast({
+        title: "Microphone Access",
+        description: "Please allow microphone access to use voice input.",
+        variant: "destructive",
+      });
+    }
+  }, [isRecording, isMicrophoneAvailable, toast]);
+
   const startRecording = () => {
     if (!browserSupportsSpeechRecognition) {
       toast({
@@ -37,23 +49,28 @@ export const useSpeechToText = () => {
       return;
     }
 
-    if (!isMicrophoneAvailable) {
+    try {
+      setIsRecording(true);
+      resetTranscript();
+      SpeechRecognition.startListening({ continuous: true });
+    } catch (error) {
+      console.error("Failed to start speech recognition:", error);
       toast({
-        title: "Microphone Access",
-        description: "Please allow microphone access to use voice input.",
+        title: "Error",
+        description: "Failed to start speech recognition. Please try again.",
         variant: "destructive",
       });
-      return;
+      setIsRecording(false);
     }
-
-    setIsRecording(true);
-    resetTranscript();
-    SpeechRecognition.startListening({ continuous: true });
   };
 
   const stopRecording = () => {
-    setIsRecording(false);
-    SpeechRecognition.stopListening();
+    try {
+      setIsRecording(false);
+      SpeechRecognition.stopListening();
+    } catch (error) {
+      console.error("Failed to stop speech recognition:", error);
+    }
   };
 
   return {
@@ -62,6 +79,7 @@ export const useSpeechToText = () => {
     resetTranscript,
     isRecording,
     startRecording,
-    stopRecording
+    stopRecording,
+    browserSupportsSpeechRecognition
   };
 };
