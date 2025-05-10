@@ -158,6 +158,27 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digitaler Check-in</h2>
       
+      {/* Ava animation - centered and large */}
+      <div className="flex justify-center mb-6">
+        <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-primary">
+          <video
+            autoPlay
+            loop
+            muted
+            className="w-full h-full object-cover"
+            poster="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png"
+          >
+            <source src="/ava-animation.mp4" type="video/mp4" />
+            {/* Fallback to image if video fails to load */}
+            <img
+              src="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png"
+              alt="Ava"
+              className="w-full h-full object-cover"
+            />
+          </video>
+        </div>
+      </div>
+      
       {/* Messages container */}
       <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4">
         {messages.map((message) => (
@@ -289,4 +310,3 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
 };
 
 export default ChatBot;
-
