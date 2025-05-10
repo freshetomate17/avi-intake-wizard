@@ -77,7 +77,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
               </div>
 
               {/* Bonus Programs */}
-              {selectedPrograms && selectedPrograms.length > 0 && (
+              {selectedPrograms && selectedPrograms.length > 0 ? (
                 <div className="flex items-center mb-6">
                   <Award className="h-5 w-5 text-gray-500 mr-2" />
                   <div>
@@ -85,6 +85,14 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
                     {selectedPrograms.map((program, index) => (
                       <p key={program} className="font-medium">{formatProgramName(program)}</p>
                     ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center mb-6">
+                  <Award className="h-5 w-5 text-gray-400 mr-2" />
+                  <div>
+                    <p className="text-sm text-gray-400">Bonus Programs</p>
+                    <p className="text-sm text-gray-500 italic">No bonus programs selected</p>
                   </div>
                 </div>
               )}
