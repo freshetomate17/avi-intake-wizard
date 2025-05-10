@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import LandingBooking from "@/components/LandingBooking";
 import ChatBot from "@/components/ChatBot";
 import UploadDocs from "@/components/UploadDocs";
 import BoardingPass from "@/components/BoardingPass";
@@ -8,7 +7,6 @@ import DoctorDashboard from "@/components/DoctorDashboard";
 
 // Main flow steps
 enum FlowStep {
-  LANDING,
   CHATBOT,
   UPLOAD,
   BOARDING_PASS,
@@ -16,7 +14,7 @@ enum FlowStep {
 }
 
 const Index = () => {
-  const [currentStep, setCurrentStep] = useState<FlowStep>(FlowStep.LANDING);
+  const [currentStep, setCurrentStep] = useState<FlowStep>(FlowStep.CHATBOT);
 
   // Function to navigate to next step
   const goToNextStep = () => {
@@ -36,6 +34,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center">
       <div className="w-full max-w-3xl p-4">
+        {/* Logo in the top right */}
+        <div className="absolute top-4 right-4">
+          <img src="/avi-logo.png" alt="avi logo" className="h-10" />
+        </div>
+        
         {/* Progress indicator */}
         <div className="w-full mb-6 flex justify-between">
           {Object.keys(FlowStep)
@@ -45,15 +48,12 @@ const Index = () => {
                 key={step}
                 className={`w-full h-1 ${
                   Number(step) <= currentStep ? "bg-primary" : "bg-gray-200"
-                } ${index < 4 ? "mr-1" : ""}`}
+                } ${index < 3 ? "mr-1" : ""}`}
               />
             ))}
         </div>
 
         {/* Current step component */}
-        {currentStep === FlowStep.LANDING && (
-          <LandingBooking onComplete={goToNextStep} />
-        )}
         {currentStep === FlowStep.CHATBOT && (
           <ChatBot onComplete={goToNextStep} />
         )}
@@ -69,7 +69,7 @@ const Index = () => {
 
         {/* Navigation buttons */}
         <div className="mt-8 flex justify-between">
-          {currentStep > FlowStep.LANDING && (
+          {currentStep > FlowStep.CHATBOT && (
             <button
               onClick={() => setCurrentStep(prev => prev - 1)}
               className="px-4 py-2 border border-primary text-primary rounded-xl"
@@ -78,7 +78,7 @@ const Index = () => {
             </button>
           )}
           
-          {currentStep < FlowStep.DOCTOR_DASHBOARD && currentStep !== FlowStep.LANDING && (
+          {currentStep < FlowStep.DOCTOR_DASHBOARD && (
             <button
               onClick={goToNextStep}
               className="px-4 py-2 bg-primary text-white rounded-xl ml-auto"

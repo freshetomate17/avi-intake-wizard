@@ -16,7 +16,11 @@ interface Message {
 
 const ChatBot = ({ onComplete }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "Hi! I'm avi. I'll help you check in. What's your full name?", sender: "bot" }
+    { 
+      id: 1, 
+      text: "Willkommen zum digitalen Check-in! Ich bin Ava, Ihre digitale Assistentin. Ich werde Ihnen helfen, den Check-in-Prozess abzuschließen. Was ist Ihr vollständiger Name?", 
+      sender: "bot" 
+    }
   ]);
   const [input, setInput] = useState("");
   const [step, setStep] = useState(0);
@@ -24,9 +28,9 @@ const ChatBot = ({ onComplete }: ChatBotProps) => {
 
   // Questions flow
   const questions = [
-    "What's your full name?",
-    "What's your date of birth? (DD/MM/YYYY)",
-    "What's the reason for your visit today?"
+    "Was ist Ihr vollständiger Name?",
+    "Was ist Ihr Geburtsdatum? (TT/MM/JJJJ)",
+    "Was ist der Grund für Ihren Besuch heute?"
   ];
 
   const handleSend = () => {
@@ -50,7 +54,7 @@ const ChatBot = ({ onComplete }: ChatBotProps) => {
       setTimeout(() => {
         const completionMessage = { 
           id: messages.length + 2, 
-          text: "Thank you! Your check-in information has been recorded.", 
+          text: "Vielen Dank! Ihre Check-in-Informationen wurden erfasst.", 
           sender: "bot" as const 
         };
         setMessages(prev => [...prev, completionMessage]);
@@ -72,21 +76,21 @@ const ChatBot = ({ onComplete }: ChatBotProps) => {
       // Simulate recording for demo
       setTimeout(() => {
         setIsRecording(false);
-        setInput("This is a simulated voice input");
+        setInput("Dies ist eine simulierte Spracheingabe");
       }, 2000);
     }
   };
 
   return (
     <div className="flex flex-col h-[80vh]">
-      <h2 className="text-2xl font-serif mb-4">Digital Check-in</h2>
+      <h2 className="text-2xl font-serif mb-4">Digitaler Check-in</h2>
       
       <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4">
         <div className="flex items-center mb-6">
           <div className="bg-primary text-white p-3 rounded-full">
-            avi
+            Ava
           </div>
-          <h3 className="ml-3 font-semibold text-lg">Digital Assistant</h3>
+          <h3 className="ml-3 font-semibold text-lg">Digitale Assistentin</h3>
         </div>
         
         {/* Messages */}
@@ -125,12 +129,12 @@ const ChatBot = ({ onComplete }: ChatBotProps) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Type your response..."
+          placeholder="Geben Sie Ihre Antwort ein..."
           className="flex-grow"
         />
         
         <Button onClick={handleSend} disabled={!input.trim()}>
-          Send
+          Senden
         </Button>
       </div>
       
@@ -140,7 +144,7 @@ const ChatBot = ({ onComplete }: ChatBotProps) => {
           variant="outline"
           className="border-primary text-primary"
         >
-          Next
+          Weiter
         </Button>
       </div>
     </div>
