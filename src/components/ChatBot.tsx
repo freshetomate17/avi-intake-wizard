@@ -10,6 +10,58 @@ import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 
+// System prompt for Chat API
+const SYSTEM_PROMPT = `You are Ava, the avi Check-In Bot.
+Your primary task is to guide the patient through the structured medical check-in questionnaire.
+While following the defined steps, you may adapt your responses to acknowledge or clarify the user's input, as long as you stay within the scope of the check-in process.
+
+*Flow & Rules*
+
+1. Greeting & Pre-Fill Confirmation
+   “Hi! I’m Ava, your avi Check-In Bot. Nice to meet you! I have these details from your appointment booking:
+   • Name: John Doe
+   • Date of Birth: 01/01/1980
+   • Reason for Visit: Routine Check-Up
+   Are these correct?”
+
+2. Q&A Sequence (one question at a time; acknowledge the user's input briefly before moving to the next question.)
+   1. “Do you have any allergies?”
+   2. “Do you have any pre-existing medical conditions?”
+   3. “Are you currently taking any medications?”
+   4. “What is your vaccination status?”
+   5. “Could you describe your lifestyle? For example, do you smoke or exercise regularly?”
+   6. “Please upload any relevant documents. One at a time.”
+
+3. Document Labeling
+   After each upload:
+   “Labeling now… I detected this as a Lab Report dated MM/DD/YYYY. Is that correct?”
+
+4. Final Summary & Single Confirmation
+   At the end, present one consolidated summary of all collected information:
+   “Here’s everything I’ve captured:
+   • Name: …
+   • DOB: …
+   • Visit Reason: …
+   • Allergies: …
+   • Conditions: …
+   • Medications: …
+   • Vaccination Status: …
+   • Lifestyle: …
+   • Documents: …
+   Is all of that correct?”
+
+5. QR Boarding Pass & Closing
+   “Great! Generating your digital boarding pass now.”
+   [Displays QR Code]
+   “Scan this at reception for automatic check-in. Thank you!”
+
+*Strict Constraints*
+
+* Do not stray from these steps or engage in unrelated conversations.
+* Acknowledge user inputs before moving to the next question.
+* Only once at the very end, provide the full summary of everything the patient has said.
+* If the patient requests info unrelated to the conversation, politely respond: “I’m here to guide your medical check-in. Let’s continue with the next question.”`;
+
 interface Message {
   id: number;
   text: string;
@@ -20,37 +72,24 @@ interface Message {
 
 interface ChatBotProps {
   onComplete: () => void;
+  name: string;
+  birthdate: string;
+  reason: string;
 }
 
-export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Welcome to the digital check-in! I'm Ava, your digital assistant. I'll help you with the check-in process. 😊",
-      sender: "bot",
-    },
-    {
-      id: 2,
-      text: "What is your full name?",
-      sender: "bot",
-    },
-  ]);
+export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, reason }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [step, setStep] = useState(-1);
+  // Removed step state and questions array as per instructions
+
   // speech recognition instance
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isLoadingChat, setIsLoadingChat] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
-  // Questions flow
-  const questions = [
-    "What is your date of birth? (DD/MM/YYYY)",
-    "What is the reason for your visit today?",
-    "Please summarize your concerns as concretely as possible in one sentence.",
-  ];
 
   useEffect(() => {
     // set up SpeechRecognition on mount
@@ -87,42 +126,66 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     }
   }, [toast]);
 
-  const handleSend = (overrideText?: string) => {
-    // determine text from override or input state
+  const handleSend = async (overrideText?: string) => {
     const toSend = overrideText !== undefined ? overrideText : input;
     if (!toSend.trim()) return;
 
     // append user message
-    const newMsg: Message = {
-      id: messages.length + 1,
-      text: toSend,
-      sender: "user",
-    };
-    setMessages((prev) => [...prev, newMsg]);
-
+    setMessages(prev => [
+      ...prev,
+      { id: prev.length + 1, text: toSend, sender: "user" }
+    ]);
     setInput("");
+    setIsLoadingChat(true);
 
-    // advance conversation
-    if (step < questions.length - 1) {
-      const nextStep = step + 1;
-      setStep(nextStep);
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          { id: prev.length + 1, text: questions[nextStep], sender: "bot" },
-        ]);
-      }, 500);
-    } else {
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: prev.length + 1,
-            text: "Thank you! Your check-in information has been recorded.",
-            sender: "bot",
+    // build chat history payload
+    const chatHistory = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...messages.map(m => ({
+        role: m.sender === "user" ? "user" : "assistant",
+        content: m.text
+      })),
+      { role: "user", content: toSend }
+    ];
+
+    try {
+      const res = await fetch(
+        "https://avibackend-be6209427017.herokuapp.com/api/generate_answer",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "123"
           },
+          body: JSON.stringify({ "Chat History": chatHistory })
+        }
+      );
+      const data = await res.json();
+      if (data["Chat History"]) {
+        // replace entire conversation
+        setMessages(
+          data["Chat History"].map((entry: any, idx: number) => ({
+            id: idx + 1,
+            text: entry.content,
+            sender:
+              entry.role === "user" ? "user" : "bot"
+          }))
+        );
+      } else if (data.answer) {
+        setMessages(prev => [
+          ...prev,
+          { id: prev.length + 1, text: data.answer, sender: "bot" }
         ]);
-      }, 500);
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingChat(false);
     }
   };
 

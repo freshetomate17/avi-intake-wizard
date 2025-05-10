@@ -1,13 +1,27 @@
 
 import React, { useState, useEffect } from "react";
+import { QRCodeCanvas } from 'qrcode.react';
 import { Check, Calendar, User, MapPin, Award } from "lucide-react";
 
 interface BoardingPassProps {
   onComplete: () => void;
   selectedPrograms?: string[];
+  patientName: string;
+  birthdate: string;             // ISO date string, e.g. "1980-01-23"
+  appointmentDate: string;       // ISO date string for the appointment
+  appointmentTime: string;       // time string, e.g. "10:30"
+  location: string;              // full address or location name
 }
 
-const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedPrograms = [] }) => {
+const BoardingPass: React.FC<BoardingPassProps> = ({
+  onComplete,
+  selectedPrograms = [],
+  patientName,
+  birthdate,
+  appointmentDate,
+  appointmentTime,
+  location,
+}) => {
   const [isGenerated, setIsGenerated] = useState(false);
 
   // Simulate loading time for boarding pass generation
@@ -27,6 +41,16 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
       default: return id;
     }
   };
+
+  const qrData = {
+    patientName,
+    birthdate,
+    appointmentDate,
+    appointmentTime,
+    location,
+    programs: selectedPrograms,
+  };
+  const qrValue = JSON.stringify(qrData);
 
   return (
     <div className="flex flex-col h-full">
@@ -100,31 +124,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
               {/* QR Code */}
               <div className="flex justify-center mb-4">
                 <div className="bg-gray-100 w-40 h-40 rounded-lg flex items-center justify-center">
-                  <svg viewBox="0 0 100 100" className="w-36 h-36">
-                    {/* Simplified QR code for illustration */}
-                    <rect x="5" y="5" width="90" height="90" fill="white" />
-                    <rect x="15" y="15" width="10" height="10" />
-                    <rect x="35" y="15" width="10" height="10" />
-                    <rect x="55" y="15" width="10" height="10" />
-                    <rect x="75" y="15" width="10" height="10" />
-                    
-                    <rect x="15" y="35" width="10" height="10" />
-                    <rect x="45" y="35" width="10" height="10" />
-                    <rect x="65" y="35" width="10" height="10" />
-                    
-                    <rect x="25" y="45" width="10" height="10" />
-                    <rect x="55" y="45" width="10" height="10" />
-                    <rect x="75" y="45" width="10" height="10" />
-                    
-                    <rect x="15" y="55" width="10" height="10" />
-                    <rect x="35" y="55" width="10" height="10" />
-                    <rect x="65" y="55" width="10" height="10" />
-                    
-                    <rect x="15" y="75" width="10" height="10" />
-                    <rect x="35" y="75" width="10" height="10" />
-                    <rect x="55" y="75" width="10" height="10" />
-                    <rect x="75" y="75" width="10" height="10" />
-                  </svg>
+                  <QRCodeCanvas value={qrValue} size={144} />
                 </div>
               </div>
 
