@@ -36,7 +36,7 @@ const Index = () => {
       <div className="w-full max-w-3xl p-4">
         {/* Logo in the top right */}
         <div className="absolute top-4 right-4">
-          <img src="/avi-logo.png" alt="avi logo" className="h-10" />
+          <img src="/avi-logo.png" alt="avi logo" className="h-12" />
         </div>
         
         {/* Progress indicator */}
