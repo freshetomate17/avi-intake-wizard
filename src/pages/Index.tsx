@@ -4,6 +4,7 @@ import ChatBot from "@/components/ChatBot";
 import BoardingPass from "@/components/BoardingPass";
 import BonusProgramStep from "@/components/BonusProgramStep";
 import StartCheckIn from "@/components/StartCheckIn";
+import UploadDocs from "@/components/UploadDocs";
 
 // Main flow steps
 enum FlowStep {

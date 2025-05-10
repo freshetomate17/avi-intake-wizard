@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 // Allow using SpeechRecognition on window without TS errors
 declare global {
@@ -6,9 +7,16 @@ declare global {
     webkitSpeechRecognition: any;
   }
 }
-import { Camera, FileText, Mic, MicOff } from "lucide-react";
+import { Camera, FileText, Mic, MicOff, FileImage, FileMinus, FilePlus, FileX, Bandage, Pill, FileMedical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
+
+interface Document {
+  id: number;
+  name: string;
+  uploaded: boolean;
+  type: string;
+}
 
 interface Message {
   id: number;
@@ -37,6 +45,23 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   ]);
   const [input, setInput] = useState("");
   const [step, setStep] = useState(-1);
+  const [showingDocumentList, setShowingDocumentList] = useState(false);
+  const [documentUploadCompleted, setDocumentUploadCompleted] = useState(false);
+  const [documents, setDocuments] = useState<Document[]>([
+    { id: 1, name: "Versicherungskarte (elektronisch per Foto oder NFC)", uploaded: false, type: "insurance" },
+    { id: 2, name: "Ärztliche Überweisung(en) (z. B. zum Spezialisten oder Labor)", uploaded: false, type: "referral" },
+    { id: 3, name: "Vorhandene Laborbefunde (Blutwerte, Urinanalysen etc.)", uploaded: false, type: "lab" },
+    { id: 4, name: "Vorhandene Bildgebende Befunde (Röntgen-, CT-, MRT-Berichte)", uploaded: false, type: "imaging" },
+    { id: 5, name: "Impfpass bzw. Impfnachweise", uploaded: false, type: "vaccination" },
+    { id: 6, name: "Medikationsplan oder aktuelle Rezept-Packungsbeilagen", uploaded: false, type: "medication" },
+    { id: 7, name: "Entlassungsberichte aus Krankenhäusern oder Reha", uploaded: false, type: "discharge" },
+    { id: 8, name: "Befunde zu chronischen Erkrankungen (z. B. Diabetes, COPD, KHK)", uploaded: false, type: "chronic" },
+    { id: 9, name: "Aktuelle Messdaten von Wearables oder Home-Monitoring-Geräten", uploaded: false, type: "monitoring" },
+    { id: 10, name: "Fotos von akuten Symptomen (z. B. Hautveränderungen, Schwellungen)", uploaded: false, type: "symptoms" },
+    { id: 11, name: "Ernährungs- & Lebensstil-Checkliste (falls vorhanden)", uploaded: false, type: "lifestyle" },
+    { id: 12, name: "Vollmachten oder Patientenverfügungen (sofern relevant)", uploaded: false, type: "directive" },
+  ]);
+  
   // speech recognition instance
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null);
@@ -50,6 +75,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     "What is your date of birth? (DD/MM/YYYY)",
     "What is the reason for your visit today?",
     "Please summarize your concerns as concretely as possible in one sentence.",
+    "Thank you. Now I'd like you to upload any relevant documents or photos that could help the doctor. This could include medical records, insurance cards, or photos of symptoms. Would you like to see a list of examples?",
   ];
 
   useEffect(() => {
@@ -102,7 +128,22 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
 
     setInput("");
 
-    // advance conversation
+    // Check for document-related inputs
+    const lowerCaseText = toSend.toLowerCase();
+    
+    // If user asks for document list
+    if ((lowerCaseText.includes("yes") || lowerCaseText.includes("list") || lowerCaseText.includes("example")) && step === questions.length - 1 && !showingDocumentList) {
+      showDocumentList();
+      return;
+    }
+    
+    // If user says they're done with documents
+    if ((lowerCaseText.includes("complete") || lowerCaseText.includes("finished") || lowerCaseText.includes("done")) && showingDocumentList) {
+      completeDocumentUpload();
+      return;
+    }
+
+    // advance conversation for normal flow
     if (step < questions.length - 1) {
       const nextStep = step + 1;
       setStep(nextStep);
@@ -112,7 +153,20 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           { id: prev.length + 1, text: questions[nextStep], sender: "bot" },
         ]);
       }, 500);
+    } else if (!documentUploadCompleted) {
+      // If we're at the document upload step but haven't completed it yet
+      setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            text: "Would you like to upload some documents or photos? I can show you examples of what might be useful.",
+            sender: "bot",
+          },
+        ]);
+      }, 500);
     } else {
+      // Conversation completion
       setTimeout(() => {
         setMessages((prev) => [
           ...prev,
@@ -124,6 +178,52 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         ]);
       }, 500);
     }
+  };
+
+  const showDocumentList = () => {
+    setShowingDocumentList(true);
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          text: "Here are examples of documents that might be helpful for your visit. You can upload photos of any of these, or other relevant items like wounds, injuries, blisters, etc.:\n\n" +
+                documents.map(doc => `• ${doc.name}`).join("\n\n") +
+                "\n\nPlease upload any relevant documents using the camera button below. When you're finished, just let me know that you're done.",
+          sender: "bot",
+        },
+      ]);
+    }, 500);
+  };
+
+  const completeDocumentUpload = () => {
+    setDocumentUploadCompleted(true);
+    const uploadedDocs = documents.filter(doc => doc.uploaded);
+    const missingDocs = documents.filter(doc => !doc.uploaded);
+    
+    setTimeout(() => {
+      let message = "Thank you for your uploads! ";
+      
+      if (uploadedDocs.length > 0) {
+        message += `I've received the following documents:\n\n${uploadedDocs.map(doc => `✅ ${doc.name}`).join("\n\n")}`;
+      }
+      
+      if (missingDocs.length > 0 && uploadedDocs.length > 0) {
+        message += "\n\nThe following documents were not uploaded, but that's okay if they're not relevant for your visit:";
+        message += `\n\n${missingDocs.map(doc => `❌ ${doc.name}`).join("\n\n")}`;
+      }
+      
+      message += "\n\nIs this list of uploaded documents complete? If yes, we can proceed to the next step.";
+      
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          text: message,
+          sender: "bot",
+        },
+      ]);
+    }, 500);
   };
 
   const startRecording = () => {
@@ -161,27 +261,85 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     ]);
     setIsAnalyzing(true);
     e.target.value = "";
+    
     setTimeout(() => {
       setIsAnalyzing(false);
-      let docType = "Unknown document";
-      const name = file.name.toLowerCase();
-      if (name.includes("insurance")) docType = "Insurance card";
-      else if (name.includes("referral")) docType = "Doctor's referral";
-      else if (name.includes("report")) docType = "Medical report";
+      
+      // Try to match the uploaded document with our list
+      const fileName = file.name.toLowerCase();
+      let matchedDoc: Document | undefined;
+      
+      if (fileName.includes("versicherung") || fileName.includes("insurance") || fileName.includes("card"))
+        matchedDoc = documents.find(d => d.type === "insurance");
+      else if (fileName.includes("überweisung") || fileName.includes("referral"))
+        matchedDoc = documents.find(d => d.type === "referral");
+      else if (fileName.includes("labor") || fileName.includes("lab"))
+        matchedDoc = documents.find(d => d.type === "lab");
+      else if (fileName.includes("röntgen") || fileName.includes("ct") || fileName.includes("mrt") || fileName.includes("xray"))
+        matchedDoc = documents.find(d => d.type === "imaging");
+      else if (fileName.includes("impf") || fileName.includes("vaccination"))
+        matchedDoc = documents.find(d => d.type === "vaccination");
+      else if (fileName.includes("medikation") || fileName.includes("medication"))
+        matchedDoc = documents.find(d => d.type === "medication");
+      else if (fileName.includes("entlassung") || fileName.includes("discharge"))
+        matchedDoc = documents.find(d => d.type === "discharge");
+      else if (fileName.includes("chronisch") || fileName.includes("chronic"))
+        matchedDoc = documents.find(d => d.type === "chronic");
+      else if (fileName.includes("monitor") || fileName.includes("wearable"))
+        matchedDoc = documents.find(d => d.type === "monitoring");
+      else if (fileName.includes("symptom") || fileName.includes("wound") || fileName.includes("injury") || fileName.includes("blister"))
+        matchedDoc = documents.find(d => d.type === "symptoms");
+      else if (fileName.includes("ernährung") || fileName.includes("nutrition") || fileName.includes("lifestyle"))
+        matchedDoc = documents.find(d => d.type === "lifestyle");
+      else if (fileName.includes("vollmacht") || fileName.includes("directive") || fileName.includes("verfügung"))
+        matchedDoc = documents.find(d => d.type === "directive");
+      
+      // If we found a match, mark it as uploaded
+      if (matchedDoc) {
+        setDocuments(prev => prev.map(doc => 
+          doc.id === matchedDoc?.id ? { ...doc, uploaded: true } : doc
+        ));
+        
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            text: `I've analyzed your document. It appears to be: ${matchedDoc.name}. Is this correct? You can continue uploading more documents, or let me know when you're finished.`,
+            sender: "bot",
+          },
+        ]);
+      } else {
+        // If no match found
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            text: "Thank you for uploading this document. You can continue uploading more documents, or let me know when you're finished.",
+            sender: "bot",
+          },
+        ]);
+      }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          text: `I've analyzed your document. It appears to be: ${docType}. Is this correct?`,
-          sender: "bot",
-        },
-      ]);
       toast({
-        title: "Document analyzed",
-        description: `Document recognized as ${docType}`,
+        title: "Document uploaded",
+        description: matchedDoc 
+          ? `Document recognized as ${matchedDoc.name}`
+          : "Document uploaded successfully",
       });
     }, 2000);
+  };
+
+  const getDocumentIcon = (docType: string) => {
+    switch(docType) {
+      case "insurance": return <FilePlus className="h-4 w-4" />;
+      case "referral": return <FileText className="h-4 w-4" />;
+      case "lab": return <FileMedical className="h-4 w-4" />;
+      case "imaging": return <FileImage className="h-4 w-4" />;
+      case "vaccination": return <FileMedical className="h-4 w-4" />;
+      case "medication": return <Pill className="h-4 w-4" />;
+      case "symptoms": return <Bandage className="h-4 w-4" />;
+      default: return <FileText className="h-4 w-4" />;
+    }
   };
 
   return (
