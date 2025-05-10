@@ -96,7 +96,7 @@ const Index = () => {
                 onClick={goToNextStep}
                 className="px-4 py-2 bg-primary text-white rounded-xl ml-auto"
               >
-                Continue
+                Next
               </button>
             )}
           </div>

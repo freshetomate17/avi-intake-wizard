@@ -169,7 +169,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
           }`}
           disabled={!isGenerated}
         >
-          Continue
+          Next
         </button>
       </div>
     </div>

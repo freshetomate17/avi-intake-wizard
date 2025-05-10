@@ -178,7 +178,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </p>
       </div>
       
-      {/* Ava animation - updated to use the new image */}
+      {/* Ava animation */}
       <div className="flex justify-center mb-6">
         <div className="w-64 h-64 rounded-full overflow-hidden">
           <img
@@ -289,13 +289,13 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </button>
       </div>
       
-      {/* Continue button */}
+      {/* Next button (previously Continue button) */}
       <div className="flex justify-end">
         <button
           onClick={onComplete}
           className="px-4 py-2 bg-primary text-white rounded-xl"
         >
-          Continue
+          Next
         </button>
       </div>
     </div>
