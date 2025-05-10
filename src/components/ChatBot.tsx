@@ -1,11 +1,15 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Camera, FileText } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Message {
   id: number;
   text: string;
   sender: "user" | "bot";
+  documentUrl?: string;
+  documentName?: string;
 }
 
 interface ChatBotProps {
@@ -23,6 +27,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   const [input, setInput] = useState("");
   const [step, setStep] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   // Questions flow
   const questions = [
@@ -83,6 +90,70 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     }, 2000);
   };
 
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const file = e.target.files[0];
+    
+    // Create object URL for preview
+    const objectUrl = URL.createObjectURL(file);
+    
+    // Add user message with document
+    setMessages((prev) => [
+      ...prev,
+      { 
+        id: prev.length + 1, 
+        text: "Dokument hochgeladen", 
+        sender: "user",
+        documentUrl: objectUrl,
+        documentName: file.name
+      },
+    ]);
+    
+    // Set analyzing state
+    setIsAnalyzing(true);
+    
+    // Reset file input for future uploads
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    
+    // Simulate document analysis
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      
+      // Determine document type based on filename
+      let docType = "Unbekanntes Dokument";
+      if (file.name.toLowerCase().includes("versicherung")) {
+        docType = "Versicherungskarte";
+      } else if (file.name.toLowerCase().includes("überweisung")) {
+        docType = "Ärztliche Überweisung";
+      } else if (file.name.toLowerCase().includes("befund")) {
+        docType = "Ärztlicher Befund";
+      }
+      
+      // Add bot response with document analysis
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          text: `Ich habe Ihr Dokument analysiert. Es handelt sich um: ${docType}. Ist das korrekt?`,
+          sender: "bot",
+        },
+      ]);
+      
+      // Show toast notification
+      toast({
+        title: "Dokument analysiert",
+        description: `Dokument wurde als ${docType} erkannt`,
+      });
+    }, 2000);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digitaler Check-in</h2>
@@ -112,17 +183,63 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
               }`}
             >
               {message.text}
+              {message.documentUrl && (
+                <div className="mt-2 flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  <a 
+                    href={message.documentUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm underline"
+                  >
+                    {message.documentName}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         ))}
+        {isAnalyzing && (
+          <div className="flex justify-start mb-2">
+            <div className="mr-2">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png" alt="Ava" />
+                <AvatarFallback>AVA</AvatarFallback>
+              </Avatar>
+            </div>
+            <div className="bg-white border border-gray-300 p-3 rounded-lg">
+              <div className="flex items-center">
+                <span className="mr-2">Dokument wird analysiert</span>
+                <div className="flex space-x-1">
+                  <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '200ms' }}></div>
+                  <div className="h-2 w-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '400ms' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Input area */}
       <div className="flex items-center mb-4">
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          accept=".pdf,.jpg,.jpeg,.png"
+          className="hidden"
+        />
+        <button
+          onClick={triggerFileUpload}
+          className="p-2 rounded-full mr-2 bg-gray-200 hover:bg-gray-300"
+        >
+          <Camera size={24} />
+        </button>
         <button
           onClick={isRecording ? () => setIsRecording(false) : startRecording}
           className={`p-2 rounded-full mr-2 ${
-            isRecording ? "bg-red-500 text-white" : "bg-gray-200"
+            isRecording ? "bg-red-500 text-white" : "bg-gray-200 hover:bg-gray-300"
           }`}
         >
           {isRecording ? (
@@ -172,3 +289,4 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
 };
 
 export default ChatBot;
+

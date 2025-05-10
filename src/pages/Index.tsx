@@ -1,14 +1,12 @@
 
 import { useState } from "react";
 import ChatBot from "@/components/ChatBot";
-import UploadDocs from "@/components/UploadDocs";
 import BoardingPass from "@/components/BoardingPass";
 import DoctorDashboard from "@/components/DoctorDashboard";
 
 // Main flow steps
 enum FlowStep {
   CHATBOT,
-  UPLOAD,
   BOARDING_PASS,
   DOCTOR_DASHBOARD
 }
@@ -48,7 +46,7 @@ const Index = () => {
                 key={step}
                 className={`w-full h-1 ${
                   Number(step) <= currentStep ? "bg-primary" : "bg-gray-200"
-                } ${index < 3 ? "mr-1" : ""}`}
+                } ${index < 2 ? "mr-1" : ""}`}
               />
             ))}
         </div>
@@ -56,9 +54,6 @@ const Index = () => {
         {/* Current step component */}
         {currentStep === FlowStep.CHATBOT && (
           <ChatBot onComplete={goToNextStep} />
-        )}
-        {currentStep === FlowStep.UPLOAD && (
-          <UploadDocs onComplete={goToNextStep} />
         )}
         {currentStep === FlowStep.BOARDING_PASS && (
           <BoardingPass onComplete={goToNextStep} />
