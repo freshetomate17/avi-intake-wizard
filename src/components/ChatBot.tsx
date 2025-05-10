@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -179,24 +178,14 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </p>
       </div>
       
-      {/* Ava animation - centered and large, border removed */}
+      {/* Ava animation - updated to use the new image */}
       <div className="flex justify-center mb-6">
         <div className="w-64 h-64 rounded-full overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
+          <img
+            src="/lovable-uploads/4b4e8c7a-0eea-4672-a169-74b5a16d3295.png"
+            alt="Ava"
             className="w-full h-full object-cover"
-            poster="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png"
-          >
-            <source src="/ava-animation.mp4" type="video/mp4" />
-            {/* Fallback to image if video fails to load */}
-            <img
-              src="/lovable-uploads/4ac88d2c-b393-4839-af1c-03df49b78e8c.png"
-              alt="Ava"
-              className="w-full h-full object-cover"
-            />
-          </video>
+          />
         </div>
       </div>
       
@@ -300,7 +289,7 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </button>
       </div>
       
-      {/* Removed the duplicate Continue button and kept only the one at the bottom */}
+      {/* Continue button */}
       <div className="flex justify-end">
         <button
           onClick={onComplete}
