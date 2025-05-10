@@ -1,9 +1,7 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import ChatBot from "@/components/ChatBot";
 import BoardingPass from "@/components/BoardingPass";
-import DoctorDashboard from "@/components/DoctorDashboard";
 import BonusProgramStep from "@/components/BonusProgramStep";
 import StartCheckIn from "@/components/StartCheckIn";
 
@@ -12,8 +10,7 @@ enum FlowStep {
   START_CHECKIN,
   CHATBOT,
   BONUS_PROGRAM,
-  BOARDING_PASS,
-  DOCTOR_DASHBOARD
+  BOARDING_PASS
 }
 
 const Index = () => {
@@ -23,7 +20,7 @@ const Index = () => {
   // Function to navigate to next step
   const goToNextStep = () => {
     setCurrentStep(prev => {
-      if (prev < FlowStep.DOCTOR_DASHBOARD) {
+      if (prev < FlowStep.BOARDING_PASS) {
         return prev + 1;
       }
       return prev;
@@ -48,16 +45,6 @@ const Index = () => {
           <img src="/avi-logo.png" alt="avi logo" className="h-16" />
         </div>
         
-        {/* Direct link to doctor dashboard */}
-        <div className="absolute top-10 left-8">
-          <Link 
-            to="/doctor-dashboard" 
-            className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors"
-          >
-            Doctor Dashboard
-          </Link>
-        </div>
-        
         {/* Progress indicator */}
         <div className="w-full mb-6 mt-16 flex justify-between">
           {Object.keys(FlowStep)
@@ -67,7 +54,7 @@ const Index = () => {
                 key={step}
                 className={`w-full h-1 ${
                   Number(step) <= currentStep ? "bg-primary" : "bg-gray-200"
-                } ${index < 4 ? "mr-1" : ""}`}
+                } ${index < 3 ? "mr-1" : ""}`}
               />
             ))}
         </div>
@@ -91,9 +78,6 @@ const Index = () => {
             selectedPrograms={selectedPrograms}
           />
         )}
-        {currentStep === FlowStep.DOCTOR_DASHBOARD && (
-          <DoctorDashboard />
-        )}
 
         {/* Navigation buttons - Only show for steps after START_CHECKIN */}
         {currentStep > FlowStep.START_CHECKIN && (
@@ -107,7 +91,7 @@ const Index = () => {
               </button>
             )}
             
-            {currentStep < FlowStep.DOCTOR_DASHBOARD && (
+            {currentStep < FlowStep.BOARDING_PASS && (
               <button
                 onClick={goToNextStep}
                 className="px-4 py-2 bg-primary text-white rounded-xl ml-auto"
