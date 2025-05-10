@@ -157,9 +157,9 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-serif font-bold mb-4">Digitaler Check-in</h2>
       
-      {/* Ava animation - centered and large */}
+      {/* Ava animation - centered and large, border removed */}
       <div className="flex justify-center mb-6">
-        <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-primary">
+        <div className="w-64 h-64 rounded-full overflow-hidden">
           <video
             autoPlay
             loop
