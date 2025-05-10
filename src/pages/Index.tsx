@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import ChatBot from "@/components/ChatBot";
 import BoardingPass from "@/components/BoardingPass";
 import DoctorDashboard from "@/components/DoctorDashboard";
@@ -47,8 +48,18 @@ const Index = () => {
           <img src="/avi-logo.png" alt="avi logo" className="h-16" />
         </div>
         
+        {/* Direct link to doctor dashboard */}
+        <div className="absolute top-10 left-8">
+          <Link 
+            to="/doctor-dashboard" 
+            className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors"
+          >
+            Doctor Dashboard
+          </Link>
+        </div>
+        
         {/* Progress indicator */}
-        <div className="w-full mb-6 flex justify-between">
+        <div className="w-full mb-6 mt-16 flex justify-between">
           {Object.keys(FlowStep)
             .filter(key => !isNaN(Number(key)))
             .map((step, index) => (

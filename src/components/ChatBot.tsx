@@ -1,9 +1,7 @@
-
-import React, { useState, useRef, useEffect } from "react";
-import { Camera, FileText, Mic, MicOff, Volume, VolumeX } from "lucide-react";
+import React, { useState, useRef } from "react";
+import { Camera, FileText, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
-import { useSpeech } from "@/hooks/useSpeech";
 
 interface Message {
   id: number;
@@ -34,11 +32,8 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
   const [step, setStep] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  const { speak, stopSpeaking, isSpeaking } = useSpeech();
 
   // Questions flow
   const questions = [
@@ -46,17 +41,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
     "What is the reason for your visit today?",
     "Please summarize your concerns as concretely as possible in one sentence."
   ];
-
-  // Scroll to bottom of messages when new messages are added
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    
-    // Speak the last bot message if audio is enabled
-    const lastMessage = messages[messages.length - 1];
-    if (audioEnabled && lastMessage && lastMessage.sender === 'bot') {
-      speak(lastMessage.text);
-    }
-  }, [messages, audioEnabled, speak]);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -102,11 +86,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
 
   const startRecording = () => {
     setIsRecording(true);
-    
-    // Stop any ongoing speech when recording starts
-    if (isSpeaking) {
-      stopSpeaking();
-    }
     
     // Simulate recording for 2 seconds
     setTimeout(() => {
@@ -177,21 +156,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         description: `Document recognized as ${docType}`,
       });
     }, 2000);
-  };
-
-  // Toggle audio on/off
-  const toggleAudio = () => {
-    if (isSpeaking) {
-      stopSpeaking();
-    }
-    setAudioEnabled(!audioEnabled);
-    
-    toast({
-      title: audioEnabled ? "Audio disabled" : "Audio enabled",
-      description: audioEnabled 
-        ? "Text-to-speech has been turned off" 
-        : "Text-to-speech has been turned on",
-    });
   };
 
   return (
@@ -272,8 +236,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
             </div>
           </div>
         )}
-        {/* Invisible div for scrolling to bottom */}
-        <div ref={messagesEndRef} />
       </div>
       
       {/* Input area */}
@@ -303,19 +265,6 @@ const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
             <MicOff size={24} />
           ) : (
             <Mic size={24} />
-          )}
-        </button>
-        <button
-          onClick={toggleAudio}
-          className={`p-2 rounded-full mr-2 ${
-            audioEnabled ? "bg-gray-200 hover:bg-gray-300" : "bg-gray-400"
-          } flex items-center justify-center`}
-          title={audioEnabled ? "Disable text-to-speech" : "Enable text-to-speech"}
-        >
-          {audioEnabled ? (
-            <Volume size={24} />
-          ) : (
-            <VolumeX size={24} />
           )}
         </button>
         <input
