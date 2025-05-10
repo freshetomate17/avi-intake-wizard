@@ -103,7 +103,7 @@ const BonusProgramStep: React.FC<BonusProgramStepProps> = ({ onComplete, onProgr
           onClick={handleComplete}
           className="px-4 py-2 bg-primary text-white rounded-xl"
         >
-          Continue
+          Next
         </button>
       </div>
     </div>

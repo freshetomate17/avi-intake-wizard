@@ -98,7 +98,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
       text: toSend,
       sender: "user",
     };
-    setMessages(prev => [...prev, newMsg]);
+    setMessages((prev) => [...prev, newMsg]);
 
     setInput("");
 
@@ -107,14 +107,14 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
       const nextStep = step + 1;
       setStep(nextStep);
       setTimeout(() => {
-        setMessages(prev => [
+        setMessages((prev) => [
           ...prev,
           { id: prev.length + 1, text: questions[nextStep], sender: "bot" },
         ]);
       }, 500);
     } else {
       setTimeout(() => {
-        setMessages(prev => [
+        setMessages((prev) => [
           ...prev,
           {
             id: prev.length + 1,
@@ -204,6 +204,8 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
         </p>
       </div>
       {/* Ava avatar */}
+
+      {/* Ava animation */}
       <div className="flex justify-center mb-6">
         <div className="w-64 h-64 rounded-full overflow-hidden">
           <img
@@ -329,9 +331,15 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete }) => {
           </svg>
         </button>
       </div>
-      {/* Continue */}
+
+      {/* Next button (previously Continue button) */}
       <div className="flex justify-end">
-        <Button onClick={onComplete}>Continue</Button>
+        <button
+          onClick={onComplete}
+          className="px-4 py-2 bg-primary text-white rounded-xl"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

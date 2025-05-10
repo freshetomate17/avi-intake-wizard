@@ -70,9 +70,9 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
                 <MapPin className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
                   <p className="text-sm text-gray-500">Location</p>
-                  <p className="font-medium">Dr. Julia Schmidt</p>
-                  <p className="text-sm">General Medicine Practice</p>
-                  <p className="text-sm">123 Main Street, 10115 Berlin</p>
+                  <p className="font-medium">Hausarztpraxis Avi Hauptbahnhof</p>
+                  <p className="text-sm">Luisenstraße 1</p>
+                  <p className="text-sm">80333 München</p>
                 </div>
               </div>
 
@@ -169,7 +169,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({ onComplete, selectedProgram
           }`}
           disabled={!isGenerated}
         >
-          Continue
+          Next
         </button>
       </div>
     </div>
