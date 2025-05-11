@@ -36,6 +36,7 @@ interface ChatBotProps {
 
 export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, reason }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const messagesRef = useRef<Message[]>([]);
 
   const [leonsNervigesZeug, setLeonsNervigesZeug] = useState<string[]>([]);
   const [input, setInput] = useState("");
@@ -85,6 +86,10 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       recognitionRef.current = recog;
     }
     sendInitialDetails();
+    // Prime voices for mobile Safari TTS
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+    }
   }, [toast]);
 
   useEffect(() => {
@@ -116,6 +121,11 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       window.speechSynthesis.addEventListener("voiceschanged", loadAndSpeak);
     }
     loadAndSpeak();
+  }, [messages]);
+
+  // Keep messagesRef in sync with latest messages
+  useEffect(() => {
+    messagesRef.current = messages;
   }, [messages]);
 
   const sendInitialDetails = async () => {
@@ -166,14 +176,14 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
     // append user message
     setMessages(prev => [
       ...prev,
-      { id: prev.length + 1, text: toSend, sender: "user" }
+      { id: messagesRef.current.length + 1, text: toSend, sender: "user" }
     ]);
     setInput("");
     setIsLoadingChat(true);
 
     // build chat history payload
     const chatHistory = [
-      ...messages.map(m => ({
+      ...messagesRef.current.map(m => ({
         role: m.sender === "user" ? "user" : "assistant",
         content: m.text
       })),
@@ -207,7 +217,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       } else if (data.answer) {
         // Create the new bot message object
         const newBotMsg: Message = {
-          id: messages.length + 2,
+          id: messagesRef.current.length + 1,
           text: data.answer,
           sender: "bot",
         };
@@ -215,7 +225,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
         setMessages(prev => [...prev, newBotMsg]);
 
         // If this message contains "QR-Code", report bad API
-        if (newBotMsg.text.toLowerCase().includes("allergies")) {
+        if (newBotMsg.text.toLowerCase().includes("boarding")) {
           console.log("sending everything");
           // Build the full chat history as string
           const allHistory = [...messages, newBotMsg]
@@ -225,25 +235,31 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
           const leonText = leonsNervigesZeug.join("\n");
           const payload = `${allHistory}\n${leonText}`;
           console.log("Reporting bad API with payload:", payload);
-          const response = await fetch(
+          // Call generate_summary endpoint
+          const summaryResp = await fetch(
             "https://avibackend-be6209427017.herokuapp.com/api/generate_summary",
             {
               method: "POST",
               headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "text/plain",
                 "x-api-key": "123",
               },
-              body: JSON.stringify({ text: payload }),
+              body: payload,  // send raw text
             }
-          )
-
-        const data = await response.json();
-        const newBotMsg: Message = {
-          id: messages.length + 2,
-          text: data,
-          sender: "bot",
-        };
-        setMessages(prev => [...prev, newBotMsg]);
+          );
+          console.log("generate_summary status:", summaryResp.status);
+          const summaryData = await summaryResp.json();
+          console.log("generate_summary data:", summaryData);
+          if (summaryData.answer) {
+            const newerBotMsg: Message = {
+              id: messages.length + 2,
+              text: summaryData.answer,
+              sender: "bot",
+            };
+            //setMessages(prev => [...prev, newerBotMsg]);
+          } else {
+            console.warn("No answer in generate_summary response");
+          }
 
 
         }
@@ -435,6 +451,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
             autoPlay
             loop
             muted
+            playsInline
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${!isLoadingChat && !isSpeaking ? 'opacity-100' : 'opacity-0'}`}
           />
           <video
@@ -442,6 +459,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
             autoPlay
             loop
             muted
+            playsInline
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isLoadingChat && !isSpeaking ? 'opacity-100' : 'opacity-0'}`}
           />
           <video
@@ -449,15 +467,16 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
             autoPlay
             loop
             muted
+            playsInline
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${isSpeaking ? 'opacity-100' : 'opacity-0'}`}
           />
         </div>
       </div>
       {/* Chat window */}
       <div className="flex-grow bg-gray-50 rounded-lg p-4 overflow-y-auto mb-4">
-        {messages.map((m) => (
+        {messages.map((m, idx) => (
           <div
-            key={m.id}
+            key={`${m.id}-${idx}`}
             className={`mb-2 flex ${
               m.sender === "user" ? "justify-end" : "justify-start"
             }`}
