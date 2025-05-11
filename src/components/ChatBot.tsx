@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 // Allow using SpeechRecognition on window without TS errors
 declare global {
@@ -6,10 +7,17 @@ declare global {
     webkitSpeechRecognition: any;
   }
 }
-import { Camera, FileText, Mic, MicOff } from "lucide-react";
+import { Camera, FileText, Mic, MicOff, FileImage, FileMinus, FilePlus, FileX, Bandage, Pill } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
 import { stringify } from "querystring";
+
+interface Document {
+  id: number;
+  name: string;
+  uploaded: boolean;
+  type: string;
+}
 
 interface Message {
   id: number;
@@ -28,6 +36,8 @@ interface ChatBotProps {
 
 export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, reason }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const [leonsNervigesZeug, setLeonsNervigesZeug] = useState<string[]>([]);
   const [input, setInput] = useState("");
   // Removed step state and questions array as per instructions
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -109,6 +119,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
   }, [messages]);
 
   const sendInitialDetails = async () => {
+    console.log("setting initial details")
     setIsLoadingChat(true);
     const details = `My name is ${name}\n and Date of Birth is ${birthdate}\n and my reason for Visit is ${reason}`;
     try {
@@ -126,10 +137,11 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       const data = await res.json();
       if (data["Chat History"]) {
         setMessages(
+          
           data["Chat History"].map((entry: any, idx: number) => ({
             id: idx + 1,
             text: entry.content,
-            sender: entry.role === "user" ? "user" : "bot"
+            sender: "user"
           }))
         );
       } else if (data.answer) {
@@ -193,10 +205,48 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
           }))
         );
       } else if (data.answer) {
-        setMessages(prev => [
-          ...prev,
-          { id: prev.length + 1, text: data.answer, sender: "bot" }
-        ]);
+        // Create the new bot message object
+        const newBotMsg: Message = {
+          id: messages.length + 2,
+          text: data.answer,
+          sender: "bot",
+        };
+        // Append it to messages
+        setMessages(prev => [...prev, newBotMsg]);
+
+        // If this message contains "QR-Code", report bad API
+        if (newBotMsg.text.toLowerCase().includes("allergies")) {
+          console.log("sending everything");
+          // Build the full chat history as string
+          const allHistory = [...messages, newBotMsg]
+            .map(msg => `${msg.sender}: ${msg.text}`)
+            .join("\n");
+          // Append leonsNervigesZeug entries
+          const leonText = leonsNervigesZeug.join("\n");
+          const payload = `${allHistory}\n${leonText}`;
+          console.log("Reporting bad API with payload:", payload);
+          const response = await fetch(
+            "https://avibackend-be6209427017.herokuapp.com/api/generate_summary",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": "123",
+              },
+              body: JSON.stringify({ text: payload }),
+            }
+          )
+
+        const data = await response.json();
+        const newBotMsg: Message = {
+          id: messages.length + 2,
+          text: data,
+          sender: "bot",
+        };
+        setMessages(prev => [...prev, newBotMsg]);
+
+
+        }
       }
     } catch (err: any) {
       console.error(err);
@@ -210,13 +260,59 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
     }
   };
 
+  const showDocumentList = () => {
+    setShowingDocumentList(true);
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          text: "Here are examples of documents that might be helpful for your visit. You can upload photos of any of these, or other relevant items like wounds, injuries, blisters, etc.:\n\n" +
+                documents.map(doc => `• ${doc.name}`).join("\n\n") +
+                "\n\nPlease upload any relevant documents using the camera button below. When you're finished, just let me know that you're done.",
+          sender: "bot",
+        },
+      ]);
+    }, 500);
+  };
+
+  const completeDocumentUpload = () => {
+    setDocumentUploadCompleted(true);
+    const uploadedDocs = documents.filter(doc => doc.uploaded);
+    const missingDocs = documents.filter(doc => !doc.uploaded);
+    
+    setTimeout(() => {
+      let message = "Thank you for your uploads! ";
+      
+      if (uploadedDocs.length > 0) {
+        message += `I've received the following documents:\n\n${uploadedDocs.map(doc => `✅ ${doc.name}`).join("\n\n")}`;
+      }
+      
+      if (missingDocs.length > 0 && uploadedDocs.length > 0) {
+        message += "\n\nThe following documents were not uploaded, but that's okay if they're not relevant for your visit:";
+        message += `\n\n${missingDocs.map(doc => `❌ ${doc.name}`).join("\n\n")}`;
+      }
+      
+      message += "\n\nIs this list of uploaded documents complete? If yes, we can proceed to the next step.";
+      
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          text: message,
+          sender: "bot",
+        },
+      ]);
+    }, 500);
+  };
+
   const startRecording = () => {
     const recog = recognitionRef.current;
     if (!recog) {
       toast({
         title: "Not supported",
         description: "Speech recognition is not supported in this browser.",
-        variant: "warning",
+        variant: "destructive",
       });
       return;
     }
@@ -232,40 +328,81 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) return;
     const file = e.target.files[0];
-    const objectUrl = URL.createObjectURL(file);
-    setMessages((prev) => [
+    console.log("Uploading document to analyze:", file.name);
+
+    // append user "Document uploaded" message
+    setMessages(prev => [
       ...prev,
       {
         id: prev.length + 1,
         text: "Document uploaded",
         sender: "user",
-        documentUrl: objectUrl,
+        documentUrl: URL.createObjectURL(file),
         documentName: file.name,
       },
     ]);
+
     setIsAnalyzing(true);
     e.target.value = "";
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      let docType = "Unknown document";
-      const name = file.name.toLowerCase();
-      if (name.includes("insurance")) docType = "Insurance card";
-      else if (name.includes("referral")) docType = "Doctor's referral";
-      else if (name.includes("report")) docType = "Medical report";
 
-      setMessages((prev) => [
-        ...prev,
+    try {
+      const formData = new FormData();
+      formData.append("images", file);
+
+      // First API call: analyze_image_type
+      const response = await fetch(
+        "https://avibackend-be6209427017.herokuapp.com/api/analyze_image_type",
         {
-          id: prev.length + 1,
-          text: `I've analyzed your document. It appears to be: ${docType}. Is this correct?`,
-          sender: "bot",
-        },
-      ]);
+          method: "POST",
+          headers: {
+            "x-api-key": "123"
+          },
+          body: formData,
+        }
+      );
+      console.log("Analyze response status:", response.status);
+      const data = await response.json();
+      console.log("Analyze response data:", data);
+
+      if (data.answer) {
+        setMessages(prev => [
+          ...prev,
+          { id: prev.length + 1, text: data.answer, sender: "bot" }
+        ]);
+      } else {
+        console.warn("No answer field in analysis response");
+      }
+
+      // Second API call: analyze_image
+      console.log("Sending document to /api/analyze_image");
+      const response2 = await fetch(
+        "https://avibackend-be6209427017.herokuapp.com/api/analyze_image",
+        {
+          method: "POST",
+          headers: {
+            "x-api-key": "123"
+          },
+          body: formData,
+        }
+      );
+      console.log("Analyze_image status:", response2.status);
+      const data2 = await response2.json();
+      console.log("Analyze_image data:", data2);
+      if (data2.answer) {
+        setLeonsNervigesZeug( prev => [...prev, data2.answer])
+      } else {
+        console.warn("No answer field in /api/analyze_image response");
+      }
+    } catch (err: any) {
+      console.error("Error uploading document", err);
       toast({
-        title: "Document analyzed",
-        description: `Document recognized as ${docType}`,
+        title: "Upload error",
+        description: "Failed to analyze document",
+        variant: "destructive",
       });
-    }, 2000);
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
 
