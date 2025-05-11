@@ -256,6 +256,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
               text: summaryData.answer,
               sender: "bot",
             };
+            console.log(summaryData.answer)
             //setMessages(prev => [...prev, newerBotMsg]);
           } else {
             console.warn("No answer in generate_summary response");
@@ -378,7 +379,6 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       );
       console.log("Analyze response status:", response.status);
       const data = await response.json();
-      console.log("Analyze response data:", data);
 
       if (data.answer) {
         setMessages(prev => [
@@ -403,7 +403,8 @@ export const ChatBot: React.FC<ChatBotProps> = ({ onComplete, name, birthdate, r
       );
       console.log("Analyze_image status:", response2.status);
       const data2 = await response2.json();
-      console.log("Analyze_image data:", data2);
+      console.log("Analyze_image data:", data2.answer);
+      
       if (data2.answer) {
         setLeonsNervigesZeug( prev => [...prev, data2.answer])
       } else {

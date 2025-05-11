@@ -42,15 +42,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
     }
   };
 
-  const qrData = {
-    patientName,
-    birthdate,
-    appointmentDate,
-    appointmentTime,
-    location,
-    programs: selectedPrograms,
-  };
-  const qrValue = JSON.stringify(qrData);
+  const qrValue = "https://www.notion.so/Welcome-to-your-appointment-1f0224effc858048a736e6e6d1d678bb?pvs=4";
 
   return (
     <div className="flex flex-col h-full">
@@ -77,7 +69,7 @@ const BoardingPass: React.FC<BoardingPassProps> = ({
                 <User className="h-5 w-5 text-gray-500 mr-2" />
                 <div>
                   <p className="text-sm text-gray-500">Patient</p>
-                  <p className="font-medium">John Doe</p>
+                  <p className="font-medium">Tobias Winkler</p>
                 </div>
               </div>
 
